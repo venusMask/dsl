@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="off" monitorInterval="120" name="LoggerConfig">
+    <properties>
+        <property name="LOG_PARENT_PATH">logs</property>
+        <property name="LOG_FILE_NAME">dsl</property>
+    </properties>
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [thread:%t] %-5level %l - %msg%n"/>
+        </Console>
+        <RollingRandomAccessFile
+                name="INFORollingRandomAccessFileAppender"
+                fileName="${LOG_PARENT_PATH}/info/${LOG_FILE_NAME}.log"
+                filePattern="${LOG_PARENT_PATH}/info/$${date:yyyy-MM}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [thread:%t] %-5level %l - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="1 GB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="1000"/>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile
+                name="WARNRollingRandomAccessFileAppender"
+                fileName="${LOG_PARENT_PATH}/warn/${LOG_FILE_NAME}.log"
+                filePattern="${LOG_PARENT_PATH}/warn/$${date:yyyy-MM}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [thread:%t] %-5level %l - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="1 GB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="1000"/>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile
+                name="ERRORRollingRandomAccessFileAppender"
+                fileName="${LOG_PARENT_PATH}/error/${LOG_FILE_NAME}.log"
+                filePattern="${LOG_PARENT_PATH}/error/$${date:yyyy-MM}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [thread:%t] %-5level %l - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="1 GB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="1000"/>
+        </RollingRandomAccessFile>
+    </Appenders>
+    <Loggers>
+        <Root level="ALL">
+            <AppenderRef ref="INFORollingRandomAccessFileAppender" level="info"/>
+            <AppenderRef ref="WARNRollingRandomAccessFileAppender" level="warn"/>
+            <AppenderRef ref="ERRORRollingRandomAccessFileAppender" level="error"/>
+        </Root>
+    </Loggers>
+</Configuration>
