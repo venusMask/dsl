@@ -1,4 +1,4 @@
-lexer grammar DSLLEXER;
+lexer grammar DSLLexer;
 
 fragment INT_FRAGMENT                   : [0-9];
 fragment CHAR_CN_FRAGMENT               : [\u4e00-\u9fff];

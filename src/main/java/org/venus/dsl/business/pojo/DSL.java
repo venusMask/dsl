@@ -19,6 +19,6 @@ public class DSL {
     /**
      *
      */
-    private List<RuleGroup> logicCells = new ArrayList<>();
+    private List<RuleGroup> ruleGroups = new ArrayList<>();
 
 }

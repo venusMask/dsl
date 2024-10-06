@@ -1,5 +1,7 @@
 package org.venus.dsl.business;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.venus.dsl.business.pojo.*;
 import org.venus.dsl.gen.DSLBaseVisitor;
 import org.venus.dsl.gen.DSLParser;
@@ -13,29 +15,38 @@ import java.util.List;
  */
 public class DSLBusiness extends DSLBaseVisitor<Object> {
 
+    private static final Logger logger = LoggerFactory.getLogger(DSLBusiness.class);
+
     private final DSL dsl = new DSL();
 
     @Override
     public Object visitSingleRule(DSLParser.SingleRuleContext ctx) {
-        DSLParser.RuleDefinitionContext ruleDefinitionContext = (DSLParser.RuleDefinitionContext) ctx.getChild(0);
-        RuleGroup logicCell = (RuleGroup) visitRuleDefinition(ruleDefinitionContext);
-        dsl.getLogicCells().add(logicCell);
+        DSLParser.RuleGroupContext ruleGroupContext = ctx.ruleGroup();
+        RuleGroup ruleGroup = visitRuleGroup(ruleGroupContext);
+        dsl.getRuleGroups().add(ruleGroup);
         return null;
     }
 
     @Override
-    public RuleGroup visitRuleDefinition(DSLParser.RuleDefinitionContext ctx) {
-        RuleGroup logicCell = new RuleGroup();
-        RuleDeclare ruleDeclare = (RuleDeclare) visitRuleDeclare(ctx.ruleDeclare());
-        logicCell.setRuleDeclare(ruleDeclare);
-        List<DSLParser.RuleItemDefinitionContext> definitionContexts = ctx.ruleItemDefinition();
-        for (DSLParser.RuleItemDefinitionContext definitionContext : definitionContexts) {
-            Rule ruleItem = (Rule) visitRuleItemDefinition(definitionContext);
-            logicCell.getRuleItems().add(ruleItem);
+    public RuleGroup visitRuleGroup(DSLParser.RuleGroupContext ctx) {
+        RuleGroup ruleGroup = new RuleGroup();
+        RuleDeclare ruleDeclare = visitRuleDeclare(ctx.ruleDeclare());
+        ruleGroup.setRuleDeclare(ruleDeclare);
+        for (DSLParser.RuleDefinitionContext ruleDefinitionContext : ctx.ruleDefinition()) {
+            Rule rule = visitRuleDefinition(ruleDefinitionContext);
+            ruleGroup.getRules().add(rule);
         }
-        DSLParser.JudgeContext judge = ctx.judge();
-        Object object = visitJudge(judge);
-        return logicCell;
+        return ruleGroup;
+    }
+
+    @Override
+    public Rule visitRuleDefinition(DSLParser.RuleDefinitionContext ctx) {
+        Rule rule = new Rule();
+        String ruleID = ctx.ruleID().getText();
+        rule.setRuleID(ruleID);
+        List<Expression> expressions = visitRuleItem(ctx.ruleItem());
+        rule.getExpressions().addAll(expressions);
+        return rule;
     }
 
     @Override
@@ -49,16 +60,6 @@ public class DSLBusiness extends DSLBaseVisitor<Object> {
                 .ruleNameEn(ruleNameEn)
                 .build();
         return ruleDeclare;
-    }
-
-    @Override
-    public Rule visitRuleItemDefinition(DSLParser.RuleItemDefinitionContext ctx) {
-        Rule ruleItem = new Rule();
-        String ruleItemID = ctx.ruleItemID().getText();
-        ruleItem.setRuleID(ruleItemID);
-        List<Expression> expressions = visitRuleItem(ctx.ruleItem());
-        ruleItem.getExpressions().addAll(expressions);
-        return ruleItem;
     }
 
     /**

@@ -24,6 +24,6 @@ public class RuleGroup {
     /**
      *
      */
-    private final List<Rule> ruleItems = new ArrayList<>();
+    private final List<Rule> rules = new ArrayList<>();
 
 }
