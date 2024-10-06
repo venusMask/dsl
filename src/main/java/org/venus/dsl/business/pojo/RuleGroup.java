@@ -26,4 +26,6 @@ public class RuleGroup {
      */
     private final List<Rule> rules = new ArrayList<>();
 
+    private final List<Match> matches = new ArrayList<>();
+
 }

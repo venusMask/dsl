@@ -9,7 +9,7 @@ package org.venus.dsl.gen;
 dsl: rule;
 
 rule                    :  ruleGroup                           # singleRule
-                        |  ruleDeclare ruleGroup+ judge        # mutilRule
+                        |  ruleDeclare ruleGroup+ judge        # multipleRule
                         ;
 
 ruleDeclare             : ruleID (SEPARATOR ruleNameCn)? (SEPARATOR ruleNameEn)? ;

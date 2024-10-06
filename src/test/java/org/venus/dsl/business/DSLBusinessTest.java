@@ -41,4 +41,21 @@ public class DSLBusinessTest extends TestCase {
         createBaseParser(text);
     }
 
+    public void testMultipleRule() {
+        String text = "// a1的使用规则\n" +
+                "a1 rule_name_cn_你 rule_name_en\n" +
+                "a1 rule_name_cn_你 rule_name_en\n" +
+                "1 a_1_你=  ct_你 且 查项目类型存在状态  = 确定;\n" +
+                "2 检查项目类型=ct_你 且 查项目类型存在状态=确定;\n" +
+                "3 检查项目类型=ct_我 且 查项目类型存在状态=确定;\n" +
+                "满足: 1+(2/3) 值域: \"你呀\";\n" +
+                "满足: 1+(2/3) 值域:\"你呀\";\n" +
+                "其他值域 \"2\"\n" +
+                "\n" +
+                "满足: 1+(2/3) 值域: \"你呀\";\n" +
+                "满足: 1+(2/3) 值域:\"你呀\";\n" +
+                "其他值域 \"2\"";
+        createBaseParser(text);
+    }
+
 }

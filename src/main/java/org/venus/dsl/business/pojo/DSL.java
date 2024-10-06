@@ -21,4 +21,6 @@ public class DSL {
      */
     private List<RuleGroup> ruleGroups = new ArrayList<>();
 
+    private List<Match> matches = new ArrayList<>();
+
 }
