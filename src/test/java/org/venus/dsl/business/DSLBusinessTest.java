@@ -1,5 +1,7 @@
 package org.venus.dsl.business;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONWriter;
 import junit.framework.TestCase;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -26,7 +28,8 @@ public class DSLBusinessTest extends TestCase {
         DSLBusiness logic = new DSLBusiness();
         logic.visitDsl(root);
         DSL dsl = logic.getDsl();
-        System.out.println(dsl.toString());
+        String jsonString = JSON.toJSONString(dsl, JSONWriter.Feature.PrettyFormat);
+        System.out.println(jsonString);
     }
 
     public void testSingleRule() {

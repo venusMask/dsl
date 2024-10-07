@@ -87,6 +87,10 @@ public class DSLBusiness extends DSLBaseVisitor<Object> {
         for (DSLParser.ExpressionContext expressionContext : ctx.expression()) {
             if(expressionContext instanceof DSLParser.EqContext) {
                 expressions.add(visitEq((DSLParser.EqContext) expressionContext));
+            } else if (expressionContext instanceof DSLParser.InContext) {
+                expressions.add(visitIn((DSLParser.InContext) expressionContext));
+            } else if (expressionContext instanceof DSLParser.ContainsContext) {
+                expressions.add(visitContains((DSLParser.ContainsContext) expressionContext));
             }
         }
         return expressions;
@@ -100,6 +104,28 @@ public class DSLBusiness extends DSLBaseVisitor<Object> {
         expression.setField(field);
         expression.setValue(value);
         expression.setOperator("=");
+        return expression;
+    }
+
+    @Override
+    public Expression visitIn(DSLParser.InContext ctx) {
+        Expression expression = new Expression();
+        String field = ctx.field().getText();
+        String value = ctx.value().getText();
+        expression.setField(field);
+        expression.setValue(value);
+        expression.setOperator("in");
+        return expression;
+    }
+
+    @Override
+    public Expression visitContains(DSLParser.ContainsContext ctx) {
+        Expression expression = new Expression();
+        String field = ctx.field().getText();
+        String value = ctx.value().getText();
+        expression.setField(field);
+        expression.setValue(value);
+        expression.setOperator("contains");
         return expression;
     }
 
@@ -156,7 +182,8 @@ public class DSLBusiness extends DSLBaseVisitor<Object> {
 
     @Override
     public String visitResult(DSLParser.ResultContext ctx) {
-        return ctx.STRING().getText();
+        String text = ctx.STRING().getText();
+        return text.replace("\"", "");
     }
 
     public DSL getDsl() {
