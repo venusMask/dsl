@@ -1,6 +1,8 @@
 package org.venus.dsl.business;
 
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.venus.dsl.business.pojo.*;
@@ -9,6 +11,7 @@ import org.venus.dsl.gen.DSLParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author venus
@@ -67,66 +70,42 @@ public class DSLBusiness extends DSLBaseVisitor<Object> {
 
     @Override
     public RuleDeclare visitRuleDeclare(DSLParser.RuleDeclareContext ctx) {
-        String ruleID = ctx.ruleID().getText();
-        String ruleNameCn = ctx.ruleNameCn().getText();
-        String ruleNameEn = ctx.ruleNameEn().getText();
-        RuleDeclare ruleDeclare = RuleDeclare.builder()
+        String ruleID     = Optional.ofNullable(ctx.ruleID())    .map(RuleContext::getText).orElse(null);
+        String ruleNameCn = Optional.ofNullable(ctx.ruleNameCn()).map(RuleContext::getText).orElse(null);
+        String ruleNameEn = Optional.ofNullable(ctx.ruleNameEn()).map(RuleContext::getText).orElse(null);
+        String comment    = Optional.ofNullable(ctx.comment())   .map(RuleContext::getText).orElse(null);
+        return RuleDeclare.builder()
                 .ruleID(ruleID)
                 .ruleNameCn(ruleNameCn)
                 .ruleNameEn(ruleNameEn)
+                .comment(comment)
                 .build();
-        return ruleDeclare;
     }
 
-    /**
-     * TODO: 从当前的使用情景上看, expression区分 #eq #in #contains 反而会增加编码复杂度.
-     */
     @Override
     public List<Expression> visitRuleItem(DSLParser.RuleItemContext ctx) {
         ArrayList<Expression> expressions = new ArrayList<>();
         for (DSLParser.ExpressionContext expressionContext : ctx.expression()) {
-            if(expressionContext instanceof DSLParser.EqContext) {
-                expressions.add(visitEq((DSLParser.EqContext) expressionContext));
-            } else if (expressionContext instanceof DSLParser.InContext) {
-                expressions.add(visitIn((DSLParser.InContext) expressionContext));
-            } else if (expressionContext instanceof DSLParser.ContainsContext) {
-                expressions.add(visitContains((DSLParser.ContainsContext) expressionContext));
+            String field = expressionContext.field().getText();
+            String operator = expressionContext.OPERATOR().getText();
+            DSLParser.ValueContext valueContext = expressionContext.value();
+            if(valueContext.getChildCount() == 1) {
+                SimpleExpression expression = new SimpleExpression();
+                expression.setField(field);
+                expression.setValue(valueContext.getText());
+                expression.setOperator(operator);
+                expressions.add(expression);
+            } else {
+                ValueListExpression expression = new ValueListExpression();
+                expression.setField(field);
+                expression.setOperator(operator);
+                for (TerminalNode terminalNode : valueContext.ALLCHAR()) {
+                    expression.setValue(terminalNode.getText());
+                }
+                expressions.add(expression);
             }
         }
         return expressions;
-    }
-
-    @Override
-    public Expression visitEq(DSLParser.EqContext ctx) {
-        Expression expression = new Expression();
-        String field = ctx.field().getText();
-        String value = ctx.value().getText();
-        expression.setField(field);
-        expression.setValue(value);
-        expression.setOperator("=");
-        return expression;
-    }
-
-    @Override
-    public Expression visitIn(DSLParser.InContext ctx) {
-        Expression expression = new Expression();
-        String field = ctx.field().getText();
-        String value = ctx.value().getText();
-        expression.setField(field);
-        expression.setValue(value);
-        expression.setOperator("in");
-        return expression;
-    }
-
-    @Override
-    public Expression visitContains(DSLParser.ContainsContext ctx) {
-        Expression expression = new Expression();
-        String field = ctx.field().getText();
-        String value = ctx.value().getText();
-        expression.setField(field);
-        expression.setValue(value);
-        expression.setOperator("contains");
-        return expression;
     }
 
     @Override
@@ -143,7 +122,7 @@ public class DSLBusiness extends DSLBaseVisitor<Object> {
     public Match visitMatch(DSLParser.MatchContext ctx) {
         return Match.builder()
                 .matchType("Match")
-                .expr(ctx.EXPR().getText())
+                .expr(ctx.EXPR().getText().replace("\"", ""))
                 .result(visitResult(ctx.result()))
                 .build();
     }

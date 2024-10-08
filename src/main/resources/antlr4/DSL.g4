@@ -9,27 +9,29 @@ package org.venus.dsl.gen;
 dsl: rule;
 
 rule                    :  ruleGroup                           # singleRule
-                        |  ruleDeclare ruleGroup+ judge        # multipleRule
+                        |  ruleDeclare ruleGroup+ SUMMARY judge        # multipleRule
                         ;
 
-ruleDeclare             : ruleID (SEPARATOR ruleNameCn)? (SEPARATOR ruleNameEn)? ;
-ruleID                  : ALPHANUM ;
-ruleNameCn              : ALLCHAR ;
-ruleNameEn              : ALPHANUM ;
+ruleDeclare             : ruleID (SEPARATOR ruleNameCn)? (SEPARATOR ruleNameEn)? (SEPARATOR 'comment' SEPARATOR comment)?;
+ruleID                  : ALPHANUM | STRING;
+ruleNameCn              : ALLCHAR  | STRING;
+ruleNameEn              : ALPHANUM | STRING;
+comment                 : ALPHANUM | STRING;
 
 ruleGroup               :  ruleDeclare ruleDefinition+ judge;
 ruleDefinition          :  ruleID SEPARATOR ruleItem ';' ;
 ruleItem                :  expression (SEPARATOR '且' SEPARATOR expression)*;
-expression              :  field SEPARATOR* function* SEPARATOR*  '='   SEPARATOR*  value       # eq
-                        |  field SEPARATOR* function* SEPARATOR*  '属于' SEPARATOR*  value       # in
-                        |  field SEPARATOR* function* SEPARATOR*  '包含' SEPARATOR*  value       # contains
+
+expression              :  field SEPARATOR* function* SEPARATOR* OPERATOR SEPARATOR*  value;
+
+value                   : ALLCHAR
+                        | '{' ALLCHAR SEPARATOR* (',' SEPARATOR* ALLCHAR SEPARATOR*)* '}'
                         ;
 
-value                   :  ALLCHAR;
 field                   :  ALLCHAR;
 function                :  '->' '[' ALLCHAR ']';
 
-judge                   : match* allMatch? noneMatch? anyMatch? other;
+judge                   : match* allMatch? noneMatch? anyMatch? other?;
 match                   : '满足' SEPARATOR EXPR SEPARATOR '值域' SEPARATOR result ';';
 allMatch                : '均满足值域' SEPARATOR result  ;
 noneMatch               : '均不满足值域' SEPARATOR result  ;

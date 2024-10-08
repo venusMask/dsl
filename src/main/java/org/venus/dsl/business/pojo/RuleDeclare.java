@@ -17,4 +17,6 @@ public class RuleDeclare {
 
     private String ruleNameEn;
 
+    private String comment;
+
 }
