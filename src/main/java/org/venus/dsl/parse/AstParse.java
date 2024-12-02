@@ -7,9 +7,6 @@ import org.venus.dsl.parse.node.logic.*;
 import org.venus.dsl.parse.node.output.*;
 import org.venus.dsl.ast.DslBaseVisitor;
 import org.venus.dsl.ast.DslParser;
-import org.venus.dsl.sql.parse.node.*;
-import org.venus.dsl.sql.parse.node.logic.*;
-import org.venus.dsl.sql.parse.node.output.*;
 import org.venus.dsl.parse.node.type.OperationType;
 import org.venus.dsl.parse.node.type.ValueType;
 

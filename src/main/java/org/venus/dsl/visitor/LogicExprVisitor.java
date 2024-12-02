@@ -7,7 +7,6 @@ import org.venus.dsl.parse.node.logic.*;
 import org.venus.dsl.parse.node.type.OperationType;
 import org.venus.dsl.data.RecordData;
 import org.venus.dsl.analyze.Analyze;
-import org.venus.dsl.sql.parse.node.logic.*;
 
 import java.util.Objects;
 

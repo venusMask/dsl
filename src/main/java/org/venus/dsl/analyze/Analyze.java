@@ -9,7 +9,6 @@ import org.venus.dsl.ast.DslLexer;
 import org.venus.dsl.ast.DslParser;
 import org.venus.dsl.parse.AstParse;
 import org.venus.dsl.parse.node.*;
-import org.venus.dsl.sql.parse.node.*;
 import org.venus.dsl.visitor.BaseVisitor;
 import org.venus.dsl.visitor.MultipleRuleVisitor;
 import org.venus.dsl.visitor.SingleRuleVisitor;

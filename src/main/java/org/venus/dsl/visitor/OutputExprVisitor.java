@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.venus.dsl.data.RecordData;
 import org.venus.dsl.analyze.Analyze;
 import org.venus.dsl.parse.node.output.*;
-import org.venus.dsl.sql.parse.node.output.*;
 import org.venus.dsl.parse.node.type.OperationType;
 
 import java.util.ArrayList;
