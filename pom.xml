@@ -69,7 +69,7 @@
           <visitor>true</visitor>
           <listener>false</listener>
           <sourceDirectory>${project.basedir}/src/main/resources/antlr4</sourceDirectory>
-          <outputDirectory>${project.basedir}/src/main/java/org/venus/dsl/sql/ast</outputDirectory>
+          <outputDirectory>src/main/java/org/venus/dsl/ast</outputDirectory>
         </configuration>
         <executions>
           <execution>
