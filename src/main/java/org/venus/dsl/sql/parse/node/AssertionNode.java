@@ -10,15 +10,21 @@ import java.util.List;
 @Builder
 public class AssertionNode extends Node {
 
-    private List<MatchNode> matchNodes;
+    private List<MatchNode> matches;
 
-    private List<OutputExprNode> otherOutput;
+    private List<OutputExprNode> otherOutputs;
 
-    public AssertionNode(List<MatchNode> matchNodes,
-                         List<OutputExprNode> otherOutput) {
-        this.matchNodes = matchNodes;
-        this.otherOutput = otherOutput;
-        this.children.addAll(matchNodes);
-        this.children.addAll(otherOutput);
+    public AssertionNode(List<MatchNode> matches,
+                         List<OutputExprNode> otherOutputs) {
+        this.matches = matches;
+        this.otherOutputs = otherOutputs;
+        this.matches.forEach(matchNode -> {
+            matchNode.setParent(this);
+            this.children.add(matchNode);
+        });
+        this.otherOutputs.forEach(outputExprNode -> {
+            outputExprNode.setParent(this);
+            this.children.add(outputExprNode);
+        });
     }
 }

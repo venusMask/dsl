@@ -8,20 +8,26 @@ import lombok.Getter;
 @Builder
 public class MultipleRuleNode extends Node {
 
-    private RuleDeclareNode ruleDeclareNode;
+    private RuleDeclareNode ruleDeclare;
 
-    private List<RuleGroupNode> ruleGroupNode;
+    private List<RuleGroupNode> ruleGroups;
 
-    private AssertionNode assertionNode;
+    private AssertionNode assertion;
 
-    public MultipleRuleNode(RuleDeclareNode ruleDeclareNode,
-                            List<RuleGroupNode> ruleGroupNode,
-                            AssertionNode assertionNode) {
-        this.ruleDeclareNode = ruleDeclareNode;
-        this.assertionNode = assertionNode;
-        this.ruleGroupNode = ruleGroupNode;
-        this.children.add(ruleDeclareNode);
-        this.children.addAll(ruleGroupNode);
-        this.children.add(assertionNode);
+    public MultipleRuleNode(RuleDeclareNode ruleDeclare,
+                            List<RuleGroupNode> ruleGroups,
+                            AssertionNode assertion) {
+        this.ruleDeclare = ruleDeclare;
+        this.ruleDeclare.setParent(this);
+        this.assertion = assertion;
+        this.assertion.setParent(this);
+        this.ruleGroups = ruleGroups;
+        for (RuleGroupNode groupNode : this.ruleGroups) {
+            groupNode.setParent(this);
+            this.children.add(groupNode);
+        }
+        this.children.add(ruleDeclare);
+        this.children.add(assertion);
     }
+
 }

@@ -5,7 +5,7 @@ package org.venus.dsl.sql.ast;
 }
 
 // 不能使用rule作为名称,否则生成的RuleContext会跟内置的RuleContext冲突导致报错
-dsl             : ruleGroup+                                    #singleRule
+dsl             : ruleGroup                                     #singleRule
                 | ruleDeclare ruleGroup+ '{' assertion '}'      #multipleRule
                 ;
 

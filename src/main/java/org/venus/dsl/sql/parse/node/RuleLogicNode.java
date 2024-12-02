@@ -10,25 +10,29 @@ import java.util.List;
 @Builder
 public class RuleLogicNode extends Node {
 
-    private ValueTakeNode valueTakeNode;
+    private ValueTakeNode valueTake;
 
-    private List<DictMappingNode> dictMappingNodes;
+    private List<DictMappingNode> dictMappings;
 
     private OperationType operationType;
 
     private List<String> rightValues;
 
-    public RuleLogicNode(ValueTakeNode valueTakeNode,
-                         List<DictMappingNode> dictMappingNodes,
+    public RuleLogicNode(ValueTakeNode valueTake,
+                         List<DictMappingNode> dictMappings,
                          OperationType operationType,
                          List<String> rightValues) {
-        this.valueTakeNode = valueTakeNode;
-        this.dictMappingNodes = dictMappingNodes;
+        this.valueTake = valueTake;
+        this.valueTake.setParent(this);
+        this.dictMappings = dictMappings;
         this.operationType = operationType;
         this.rightValues = rightValues;
-        this.children.add(valueTakeNode);
-        if(dictMappingNodes != null) {
-            this.children.addAll(dictMappingNodes);
+        this.children.add(valueTake);
+        if(dictMappings != null) {
+            for (DictMappingNode dictMappingNode : dictMappings) {
+                dictMappingNode.setParent(this);
+                this.children.add(dictMappingNode);
+            }
         }
     }
 }

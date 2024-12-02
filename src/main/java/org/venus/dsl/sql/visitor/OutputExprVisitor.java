@@ -1,7 +1,8 @@
-package org.venus.dsl.sql.analyze;
+package org.venus.dsl.sql.visitor;
 
 import lombok.AllArgsConstructor;
-import org.venus.dsl.sql.RecordData;
+import org.venus.dsl.sql.data.RecordData;
+import org.venus.dsl.sql.analyze.Analyze;
 import org.venus.dsl.sql.parse.node.output.*;
 import org.venus.dsl.sql.parse.node.type.OperationType;
 
@@ -22,8 +23,8 @@ public class OutputExprVisitor implements BaseVisitor {
             return tmpNode.getOutputValue();
         } else if (node instanceof StandardOutputNode) {
             StandardOutputNode tmpNode = (StandardOutputNode) node;
-            Object leftValue = new OutputExprVisitor(tmpNode.getLeftValue(), analyze).visit(recordData);
-            Object rightValue = new OutputExprVisitor(tmpNode.getRightValue(), analyze).visit(recordData);
+            Object leftValue = new OutputExprVisitor(tmpNode.getLeftOutputExpr(), analyze).visit(recordData);
+            Object rightValue = new OutputExprVisitor(tmpNode.getRightOutputExpr(), analyze).visit(recordData);
             OperationType operationType = tmpNode.getOperationType();
             if (operationType == OperationType.ADD) {
                 return (Long) leftValue + (Long) rightValue;
@@ -37,7 +38,7 @@ public class OutputExprVisitor implements BaseVisitor {
         } else if (node instanceof FunctionOutputNode) {
             FunctionOutputNode tmpNode = (FunctionOutputNode) node;
             String functionName = tmpNode.getFunctionName();
-            List<OutputExprNode> polyExprNode = tmpNode.getPolyExprNode();
+            List<OutputExprNode> polyExprNode = tmpNode.getParams();
             ArrayList<Object> param = new ArrayList<>(polyExprNode.size());
             polyExprNode.forEach(p -> {
                 Object result = new OutputExprVisitor(p, analyze).visit(recordData);

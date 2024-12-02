@@ -11,6 +11,8 @@ public class NestedLogicExprNode extends LogicExprNode {
 
     public NestedLogicExprNode(LogicExprNode child) {
         this.child = child;
+        this.child.setParent(this);
         this.children.add(child);
     }
+
 }

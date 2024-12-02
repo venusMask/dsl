@@ -1,7 +1,8 @@
-package org.venus.dsl.sql.analyze;
+package org.venus.dsl.sql.visitor;
 
 import lombok.AllArgsConstructor;
-import org.venus.dsl.sql.RecordData;
+import org.venus.dsl.sql.data.RecordData;
+import org.venus.dsl.sql.analyze.Analyze;
 import org.venus.dsl.sql.parse.node.DictMappingNode;
 import org.venus.dsl.sql.parse.node.RuleLogicNode;
 import org.venus.dsl.sql.parse.node.type.OperationType;
@@ -18,10 +19,10 @@ public class RuleLogicVisitor implements BaseVisitor {
 
     @Override
     public Object visit(RecordData recordData) {
-        ValueTakeVisitor visitor = new ValueTakeVisitor(node.getValueTakeNode(), analyze);
+        ValueTakeVisitor visitor = new ValueTakeVisitor(node.getValueTake(), analyze);
         Object fieldValue = visitor.visit(recordData);
-        if(Objects.nonNull(node.getDictMappingNodes())) {
-            List<DictMappingNode> dictMappingNodes = node.getDictMappingNodes();
+        if(Objects.nonNull(node.getDictMappings())) {
+            List<DictMappingNode> dictMappingNodes = node.getDictMappings();
             for (DictMappingNode dictMappingNode : dictMappingNodes) {
                 fieldValue = new DictMappingVisitor(
                         dictMappingNode,

@@ -17,7 +17,10 @@ public class RuleDefinitionNode extends Node {
                               List<RuleLogicNode> operations) {
         this.ruleCode = ruleCode;
         this.operations = operations;
-        this.children.addAll(operations);
+        this.operations.forEach(operation -> {
+            operation.setParent(this);
+            this.children.add(operation);
+        });
     }
 
 }

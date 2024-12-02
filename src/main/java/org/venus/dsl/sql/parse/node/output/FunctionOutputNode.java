@@ -11,12 +11,15 @@ public class FunctionOutputNode extends OutputExprNode {
 
     private String functionName;
 
-    private List<OutputExprNode> polyExprNode;
+    private List<OutputExprNode> params;
 
     public FunctionOutputNode(String functionName,
-                              List<OutputExprNode> polyExprNode) {
+                              List<OutputExprNode> params) {
         this.functionName = functionName;
-        this.polyExprNode = polyExprNode;
-        this.children.addAll(polyExprNode);
+        this.params = params;
+        this.params.forEach(output -> {
+            output.setParent(this);
+            this.children.add(output);
+        });
     }
 }

@@ -1,4 +1,4 @@
-package org.venus.dsl.sql;
+package org.venus.dsl.sql.data;
 
 public interface RecordData {
 

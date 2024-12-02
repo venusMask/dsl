@@ -3,17 +3,16 @@ package org.venus.dsl.sql.parse.node;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-
 @Builder
 @Getter
 public class SingleRuleNode extends Node {
 
-    private List<RuleGroupNode> ruleGroupNodes;
+    private RuleGroupNode ruleGroup;
 
-    public SingleRuleNode(List<RuleGroupNode> ruleGroupNodes) {
-        this.ruleGroupNodes = ruleGroupNodes;
-        this.children.addAll(ruleGroupNodes);
+    public SingleRuleNode(RuleGroupNode ruleGroup) {
+        this.ruleGroup = ruleGroup;
+        this.ruleGroup.setParent(this);
+        this.children.add(ruleGroup);
     }
 
 }

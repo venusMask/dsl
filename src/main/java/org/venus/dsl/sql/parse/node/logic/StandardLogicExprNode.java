@@ -8,19 +8,22 @@ import org.venus.dsl.sql.parse.node.type.OperationType;
 @Builder
 public class StandardLogicExprNode extends LogicExprNode {
 
-    private LogicExprNode leftNode;
+    private LogicExprNode leftLogicExpr;
 
     private OperationType operationType;
 
-    private LogicExprNode rightNode;
+    private LogicExprNode rightLogicExpr;
 
-    public StandardLogicExprNode(LogicExprNode leftNode,
+    public StandardLogicExprNode(LogicExprNode leftLogicExpr,
                                  OperationType operationType,
-                                 LogicExprNode rightNode) {
-        this.leftNode = leftNode;
+                                 LogicExprNode rightLogicExpr) {
+        this.leftLogicExpr = leftLogicExpr;
+        this.leftLogicExpr.setParent(this);
         this.operationType = operationType;
-        this.rightNode = rightNode;
-        this.children.add(leftNode);
-        this.children.add(rightNode);
+        this.rightLogicExpr = rightLogicExpr;
+        this.rightLogicExpr.setParent(this);
+        this.children.add(leftLogicExpr);
+        this.children.add(rightLogicExpr);
     }
+
 }

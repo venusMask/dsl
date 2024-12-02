@@ -11,6 +11,7 @@ public class NestedOutputNode extends OutputExprNode {
 
     public NestedOutputNode(OutputExprNode child) {
         this.child = child;
+        this.child.setParent(this);
         this.children.add(child);
     }
 }

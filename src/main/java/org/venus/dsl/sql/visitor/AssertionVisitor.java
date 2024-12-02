@@ -1,7 +1,8 @@
-package org.venus.dsl.sql.analyze;
+package org.venus.dsl.sql.visitor;
 
 import lombok.AllArgsConstructor;
-import org.venus.dsl.sql.RecordData;
+import org.venus.dsl.sql.data.RecordData;
+import org.venus.dsl.sql.analyze.Analyze;
 import org.venus.dsl.sql.parse.node.AssertionNode;
 import org.venus.dsl.sql.parse.node.MatchNode;
 import org.venus.dsl.sql.parse.node.output.OutputExprNode;
@@ -17,8 +18,8 @@ public class AssertionVisitor implements BaseVisitor {
 
     @Override
     public Object visit(RecordData recordData) {
-        List<MatchNode> matchNodes = node.getMatchNodes();
-        List<OutputExprNode> otherOutput = node.getOtherOutput();
+        List<MatchNode> matchNodes = node.getMatches();
+        List<OutputExprNode> otherOutput = node.getOtherOutputs();
         for (MatchNode matchNode : matchNodes) {
             Object matchResult = new MatchVisitor(matchNode, analyze).visit(recordData);
             if(matchResult != null) {

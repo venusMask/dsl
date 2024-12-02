@@ -19,14 +19,26 @@ public class AstParse extends DslBaseVisitor<Node> {
 
     @Override
     public SingleRuleNode visitSingleRule(DslParser.SingleRuleContext ctx) {
-        List<DslParser.RuleGroupContext> ruleGroups = ctx.ruleGroup();
-        ArrayList<RuleGroupNode> nodes = new ArrayList<>(ruleGroups.size());
-        for (DslParser.RuleGroupContext ruleGroup : ruleGroups) {
-            RuleGroupNode ruleGroupNode = visitRuleGroup(ruleGroup);
-            nodes.add(ruleGroupNode);
-        }
+        DslParser.RuleGroupContext ruleGroupCxt = ctx.ruleGroup();
+        RuleGroupNode ruleGroupNode = (RuleGroupNode) visit(ruleGroupCxt);
         return SingleRuleNode.builder()
-                .ruleGroupNodes(nodes)
+                .ruleGroup(ruleGroupNode)
+                .build();
+    }
+
+    @Override
+    public MultipleRuleNode visitMultipleRule(DslParser.MultipleRuleContext ctx) {
+        RuleDeclareNode ruleDeclareNode = (RuleDeclareNode) visit(ctx.ruleDeclare());
+        List<DslParser.RuleGroupContext> ruleGroupContexts = ctx.ruleGroup();
+        ArrayList<RuleGroupNode> ruleGroupNodes = new ArrayList<>(ruleGroupContexts.size());
+        for (DslParser.RuleGroupContext ruleGroupContext : ruleGroupContexts) {
+            ruleGroupNodes.add((RuleGroupNode) visit(ruleGroupContext));
+        }
+        AssertionNode assertionNode = (AssertionNode) visit(ctx.assertion());
+        return MultipleRuleNode.builder()
+                .ruleDeclare(ruleDeclareNode)
+                .ruleGroups(ruleGroupNodes)
+                .assertion(assertionNode)
                 .build();
     }
 
@@ -91,8 +103,8 @@ public class AstParse extends DslBaseVisitor<Node> {
             polyNodes.add((OutputExprNode) visit(context));
         }
         return AssertionNode.builder()
-                .matchNodes(matchNodes)
-                .otherOutput(polyNodes)
+                .matches(matchNodes)
+                .otherOutputs(polyNodes)
                 .build();
     }
 
@@ -101,8 +113,8 @@ public class AstParse extends DslBaseVisitor<Node> {
         LogicExprNode logicExprNode = (LogicExprNode) visit(ctx.logicExpr());
         OutputExprNode polyExprNode = (OutputExprNode) visit(ctx.outputExpr());
         return MatchNode.builder()
-                .logicExprNode(logicExprNode)
-                .polyExprNode(polyExprNode)
+                .logicExpr(logicExprNode)
+                .outputExpr(polyExprNode)
                 .build();
     }
 
@@ -127,8 +139,8 @@ public class AstParse extends DslBaseVisitor<Node> {
         LogicExprNode leftValue = (LogicExprNode) visit(ctx.lhs);
         LogicExprNode rightValue = (LogicExprNode) visit(ctx.rhs);
         return StandardLogicExprNode.builder()
-                .leftNode(leftValue)
-                .rightNode(rightValue)
+                .leftLogicExpr(leftValue)
+                .rightLogicExpr(rightValue)
                 .operationType(OperationType.AND)
                 .build();
     }
@@ -136,7 +148,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     @Override
     public Node visitNotExpr(DslParser.NotExprContext ctx) {
         return ExcludeLogicExprNode.builder()
-                .logicExprNode((LogicExprNode)visit(ctx.rhs))
+                .logicExpr((LogicExprNode)visit(ctx.rhs))
                 .build();
     }
 
@@ -145,8 +157,8 @@ public class AstParse extends DslBaseVisitor<Node> {
         LogicExprNode leftValue = (LogicExprNode) visit(ctx.lhs);
         LogicExprNode rightValue = (LogicExprNode) visit(ctx.rhs);
         return StandardLogicExprNode.builder()
-                .leftNode(leftValue)
-                .rightNode(rightValue)
+                .leftLogicExpr(leftValue)
+                .rightLogicExpr(rightValue)
                 .operationType(OperationType.OR)
                 .build();
     }
@@ -159,8 +171,8 @@ public class AstParse extends DslBaseVisitor<Node> {
         DslParser.ValueContext valueContext = ctx.rhs;
         String rightNode = trimString(valueContext.getText());
         return RuleLogicNode.builder()
-                .valueTakeNode(leftNode)
-                .dictMappingNodes(dictNodes)
+                .valueTake(leftNode)
+                .dictMappings(dictNodes)
                 .rightValues(Collections.singletonList(rightNode))
                 .operationType(OperationType.EQUAL)
                 .build();
@@ -174,8 +186,8 @@ public class AstParse extends DslBaseVisitor<Node> {
         DslParser.ValueContext valueContext = ctx.rhs;
         String rightNode = trimString(valueContext.getText());
         return RuleLogicNode.builder()
-                .valueTakeNode(leftNode)
-                .dictMappingNodes(dictNodes)
+                .valueTake(leftNode)
+                .dictMappings(dictNodes)
                 .rightValues(Collections.singletonList(rightNode))
                 .operationType(OperationType.NotEqual)
                 .build();
@@ -210,8 +222,8 @@ public class AstParse extends DslBaseVisitor<Node> {
             }
         }
         return RuleLogicNode.builder()
-                .valueTakeNode(leftNode)
-                .dictMappingNodes(dictNodes)
+                .valueTake(leftNode)
+                .dictMappings(dictNodes)
                 .rightValues(rightValues)
                 .operationType(OperationType.IN)
                 .build();
@@ -227,7 +239,7 @@ public class AstParse extends DslBaseVisitor<Node> {
         }
         return FunctionOutputNode.builder()
                 .functionName(functionName)
-                .polyExprNode(nodes)
+                .params(nodes)
                 .build();
     }
 
@@ -267,8 +279,8 @@ public class AstParse extends DslBaseVisitor<Node> {
     @Override
     public OutputExprNode visitMulExpr(DslParser.MulExprContext ctx) {
         return StandardOutputNode.builder()
-                .leftValue((OutputExprNode) visit(ctx.lhs))
-                .rightValue((OutputExprNode) visit(ctx.rhs))
+                .leftOutputExpr((OutputExprNode) visit(ctx.lhs))
+                .rightOutputExpr((OutputExprNode) visit(ctx.rhs))
                 .operationType(OperationType.MULTIPLY)
                 .build();
     }
@@ -276,8 +288,8 @@ public class AstParse extends DslBaseVisitor<Node> {
     @Override
     public Node visitDivExpr(DslParser.DivExprContext ctx) {
         return StandardOutputNode.builder()
-                .leftValue((OutputExprNode) visit(ctx.lhs))
-                .rightValue((OutputExprNode) visit(ctx.rhs))
+                .leftOutputExpr((OutputExprNode) visit(ctx.lhs))
+                .rightOutputExpr((OutputExprNode) visit(ctx.rhs))
                 .operationType(OperationType.DIVIDE)
                 .build();
     }
@@ -285,8 +297,8 @@ public class AstParse extends DslBaseVisitor<Node> {
     @Override
     public Node visitAddExpr(DslParser.AddExprContext ctx) {
         return StandardOutputNode.builder()
-                .leftValue((OutputExprNode) visit(ctx.lhs))
-                .rightValue((OutputExprNode) visit(ctx.rhs))
+                .leftOutputExpr((OutputExprNode) visit(ctx.lhs))
+                .rightOutputExpr((OutputExprNode) visit(ctx.rhs))
                 .operationType(OperationType.ADD)
                 .build();
     }
@@ -294,8 +306,8 @@ public class AstParse extends DslBaseVisitor<Node> {
     @Override
     public Node visitSubExpr(DslParser.SubExprContext ctx) {
         return StandardOutputNode.builder()
-                .leftValue((OutputExprNode) visit(ctx.lhs))
-                .rightValue((OutputExprNode) visit(ctx.rhs))
+                .leftOutputExpr((OutputExprNode) visit(ctx.lhs))
+                .rightOutputExpr((OutputExprNode) visit(ctx.rhs))
                 .operationType(OperationType.SUBTRACT)
                 .build();
     }

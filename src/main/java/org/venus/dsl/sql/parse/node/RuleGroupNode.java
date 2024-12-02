@@ -22,12 +22,17 @@ public class RuleGroupNode extends Node {
                          List<RuleDefinitionNode> ruleDefinition,
                          AssertionNode assertion) {
         this.ruleDeclare = ruleDeclare;
+        this.ruleDeclare.setParent(this);
         this.ruleDefinition = ruleDefinition;
         this.assertion = assertion;
+        this.assertion.setParent(this);
         this.children.add(ruleDeclare);
         this.children.addAll(ruleDefinition);
         this.children.add(assertion);
-        this.ruleDefinition.forEach(definition -> ruleDefinitionMap.put(definition.getRuleCode(), definition));
+        this.ruleDefinition.forEach(definition -> {
+            definition.setParent(this);
+            ruleDefinitionMap.put(definition.getRuleCode(), definition);
+        });
     }
 
 }

@@ -1,7 +1,8 @@
-package org.venus.dsl.sql.analyze;
+package org.venus.dsl.sql.visitor;
 
 import lombok.AllArgsConstructor;
-import org.venus.dsl.sql.RecordData;
+import org.venus.dsl.sql.data.RecordData;
+import org.venus.dsl.sql.analyze.Analyze;
 import org.venus.dsl.sql.parse.node.ValueTakeNode;
 import org.venus.dsl.sql.parse.node.type.ValueType;
 

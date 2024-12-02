@@ -9,15 +9,18 @@ import org.venus.dsl.sql.parse.node.output.OutputExprNode;
 @Builder
 public class MatchNode extends Node {
 
-    private LogicExprNode logicExprNode;
+    private LogicExprNode logicExpr;
 
-    private OutputExprNode polyExprNode;
+    private OutputExprNode outputExpr;
 
-    public MatchNode(LogicExprNode logicExprNode,
-                     OutputExprNode polyExprNode) {
-        this.logicExprNode = logicExprNode;
-        this.polyExprNode = polyExprNode;
-        this.children.add(logicExprNode);
-        this.children.add(polyExprNode);
+    public MatchNode(LogicExprNode logicExpr,
+                     OutputExprNode outputExpr) {
+        this.logicExpr = logicExpr;
+        this.logicExpr.setParent(this);
+        this.outputExpr = outputExpr;
+        this.outputExpr.setParent(this);
+        this.children.add(logicExpr);
+        this.children.add(outputExpr);
     }
+
 }

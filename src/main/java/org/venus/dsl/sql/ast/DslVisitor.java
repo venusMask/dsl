@@ -90,6 +90,12 @@ public interface DslVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitValue(DslParser.ValueContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link DslParser#inValue}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInValue(DslParser.InValueContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code AndExpr}
 	 * labeled alternative in {@link DslParser#logicExpr}.
 	 * @param ctx the parse tree

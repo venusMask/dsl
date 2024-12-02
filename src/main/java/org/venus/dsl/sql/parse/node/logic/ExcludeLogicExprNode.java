@@ -10,10 +10,12 @@ public class ExcludeLogicExprNode extends LogicExprNode {
 
     private final OperationType operationType = OperationType.NOT;
 
-    private LogicExprNode logicExprNode;
+    private LogicExprNode logicExpr;
 
-    public ExcludeLogicExprNode(LogicExprNode logicExprNode) {
-        this.logicExprNode = logicExprNode;
-        this.children.add(logicExprNode);
+    public ExcludeLogicExprNode(LogicExprNode logicExpr) {
+        this.logicExpr = logicExpr;
+        this.logicExpr.setParent(this);
+        this.children.add(logicExpr);
     }
+
 }

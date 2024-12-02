@@ -1,6 +1,6 @@
-package org.venus.dsl.sql.analyze;
+package org.venus.dsl.sql.visitor;
 
-import org.venus.dsl.sql.RecordData;
+import org.venus.dsl.sql.data.RecordData;
 
 public interface BaseVisitor {
 
