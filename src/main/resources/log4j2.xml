@@ -44,6 +44,7 @@
     </Appenders>
     <Loggers>
         <Root level="ALL">
+            <AppenderRef ref="ConsoleAppender" level="info" />
             <AppenderRef ref="INFORollingRandomAccessFileAppender" level="info"/>
             <AppenderRef ref="WARNRollingRandomAccessFileAppender" level="warn"/>
             <AppenderRef ref="ERRORRollingRandomAccessFileAppender" level="error"/>
