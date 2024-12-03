@@ -45,26 +45,75 @@ public interface DslVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitRuleDefinition(DslParser.RuleDefinitionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code eqExpr}
+	 * Visit a parse tree produced by the {@code EqRuleExpr}
 	 * labeled alternative in {@link DslParser#ruleLogic}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitEqExpr(DslParser.EqExprContext ctx);
+	T visitEqRuleExpr(DslParser.EqRuleExprContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code neExpr}
+	 * Visit a parse tree produced by the {@code NeRuleExpr}
 	 * labeled alternative in {@link DslParser#ruleLogic}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitNeExpr(DslParser.NeExprContext ctx);
+	T visitNeRuleExpr(DslParser.NeRuleExprContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code inExpr}
+	 * Visit a parse tree produced by the {@code InRuleExpr}
 	 * labeled alternative in {@link DslParser#ruleLogic}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitInExpr(DslParser.InExprContext ctx);
+	T visitInRuleExpr(DslParser.InRuleExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code AddRuleExpr}
+	 * labeled alternative in {@link DslParser#ruleLogic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAddRuleExpr(DslParser.AddRuleExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code SubRuleExpr}
+	 * labeled alternative in {@link DslParser#ruleLogic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSubRuleExpr(DslParser.SubRuleExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code MulRuleExpr}
+	 * labeled alternative in {@link DslParser#ruleLogic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMulRuleExpr(DslParser.MulRuleExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DivRuleExpr}
+	 * labeled alternative in {@link DslParser#ruleLogic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDivRuleExpr(DslParser.DivRuleExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code GtRuleExpr}
+	 * labeled alternative in {@link DslParser#ruleLogic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitGtRuleExpr(DslParser.GtRuleExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code GeRuleExpr}
+	 * labeled alternative in {@link DslParser#ruleLogic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitGeRuleExpr(DslParser.GeRuleExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ContainsRuleExpr}
+	 * labeled alternative in {@link DslParser#ruleLogic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitContainsRuleExpr(DslParser.ContainsRuleExprContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link DslParser#dictMapping}.
 	 * @param ctx the parse tree
@@ -84,116 +133,6 @@ public interface DslVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMatch(DslParser.MatchContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link DslParser#value}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitValue(DslParser.ValueContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link DslParser#inValue}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInValue(DslParser.InValueContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code AndExpr}
-	 * labeled alternative in {@link DslParser#logicExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAndExpr(DslParser.AndExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code ParenLogicExpr}
-	 * labeled alternative in {@link DslParser#logicExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitParenLogicExpr(DslParser.ParenLogicExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code NotExpr}
-	 * labeled alternative in {@link DslParser#logicExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNotExpr(DslParser.NotExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code OrExpr}
-	 * labeled alternative in {@link DslParser#logicExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitOrExpr(DslParser.OrExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code RuleItemExpr}
-	 * labeled alternative in {@link DslParser#logicExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRuleItemExpr(DslParser.RuleItemExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code MulExpr}
-	 * labeled alternative in {@link DslParser#outputExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMulExpr(DslParser.MulExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code DivExpr}
-	 * labeled alternative in {@link DslParser#outputExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDivExpr(DslParser.DivExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code FunctionCallSymbol}
-	 * labeled alternative in {@link DslParser#outputExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunctionCallSymbol(DslParser.FunctionCallSymbolContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code NumberVarExpr}
-	 * labeled alternative in {@link DslParser#outputExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNumberVarExpr(DslParser.NumberVarExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code FieldVarExpr}
-	 * labeled alternative in {@link DslParser#outputExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFieldVarExpr(DslParser.FieldVarExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code SubExpr}
-	 * labeled alternative in {@link DslParser#outputExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSubExpr(DslParser.SubExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code ParenPolyExpr}
-	 * labeled alternative in {@link DslParser#outputExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitParenPolyExpr(DslParser.ParenPolyExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code AddExpr}
-	 * labeled alternative in {@link DslParser#outputExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAddExpr(DslParser.AddExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code StringVarExpr}
-	 * labeled alternative in {@link DslParser#outputExpr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitStringVarExpr(DslParser.StringVarExprContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code RuleTake}
 	 * labeled alternative in {@link DslParser#valueTake}.
 	 * @param ctx the parse tree
@@ -207,4 +146,123 @@ public interface DslVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFieldTake(DslParser.FieldTakeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NumberTake}
+	 * labeled alternative in {@link DslParser#valueTake}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNumberTake(DslParser.NumberTakeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code StringTake}
+	 * labeled alternative in {@link DslParser#valueTake}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStringTake(DslParser.StringTakeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ListTake}
+	 * labeled alternative in {@link DslParser#valueTake}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitListTake(DslParser.ListTakeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code RuleCodeLogicExpr}
+	 * labeled alternative in {@link DslParser#logicExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRuleCodeLogicExpr(DslParser.RuleCodeLogicExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NotLogicExpr}
+	 * labeled alternative in {@link DslParser#logicExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNotLogicExpr(DslParser.NotLogicExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NestLogicExpr}
+	 * labeled alternative in {@link DslParser#logicExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNestLogicExpr(DslParser.NestLogicExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code AndLogicExpr}
+	 * labeled alternative in {@link DslParser#logicExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAndLogicExpr(DslParser.AndLogicExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code OrLogicExpr}
+	 * labeled alternative in {@link DslParser#logicExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOrLogicExpr(DslParser.OrLogicExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NumberOutputExpr}
+	 * labeled alternative in {@link DslParser#outputExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNumberOutputExpr(DslParser.NumberOutputExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code SubOutputExpr}
+	 * labeled alternative in {@link DslParser#outputExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSubOutputExpr(DslParser.SubOutputExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DivOutputExpr}
+	 * labeled alternative in {@link DslParser#outputExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDivOutputExpr(DslParser.DivOutputExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code StringOutputExpr}
+	 * labeled alternative in {@link DslParser#outputExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStringOutputExpr(DslParser.StringOutputExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code MulOutputExpr}
+	 * labeled alternative in {@link DslParser#outputExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMulOutputExpr(DslParser.MulOutputExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code AddOutputExpr}
+	 * labeled alternative in {@link DslParser#outputExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAddOutputExpr(DslParser.AddOutputExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code FunctionOutputExpr}
+	 * labeled alternative in {@link DslParser#outputExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionOutputExpr(DslParser.FunctionOutputExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code FieldOutputExpr}
+	 * labeled alternative in {@link DslParser#outputExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFieldOutputExpr(DslParser.FieldOutputExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NestOutputExpr}
+	 * labeled alternative in {@link DslParser#outputExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNestOutputExpr(DslParser.NestOutputExprContext ctx);
 }

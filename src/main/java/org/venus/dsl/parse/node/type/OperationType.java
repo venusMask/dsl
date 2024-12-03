@@ -28,6 +28,12 @@ public enum OperationType {
     MULTIPLY(10, "MULTIPLY"),
 
     DIVIDE(11, "DIVIDE"),
+
+    CONTAINS(12, "CONTAINS"),
+
+    GE(12, "ge"),
+
+    GT(13, "gt"),
     ;
 
     private final int code;

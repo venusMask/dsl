@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import org.venus.dsl.analyze.Analyze;
 import org.venus.dsl.parse.node.type.ValueType;
 import org.venus.dsl.data.RecordData;
-import org.venus.dsl.parse.node.ValueTakeNode;
+import org.venus.dsl.parse.node.value.DirectTakeNode;
+import org.venus.dsl.parse.node.value.FieldTakeNode;
+import org.venus.dsl.parse.node.value.ListTakeNode;
+import org.venus.dsl.parse.node.value.ValueTakeNode;
 
 @AllArgsConstructor
 public class ValueTakeVisitor implements BaseVisitor {
@@ -15,13 +18,18 @@ public class ValueTakeVisitor implements BaseVisitor {
 
     @Override
     public Object visit(RecordData recordData) {
-        ValueType type = node.getType();
-        String value = node.getValue();
-        // 从数据集中取值
-        if(type == ValueType.FIELD) {
-            return recordData.getField(value);
+        if(node instanceof DirectTakeNode) {
+            DirectTakeNode tmpNode = (DirectTakeNode) node;
+            return tmpNode.getDirectValue();
+        } else if (node instanceof FieldTakeNode) {
+            FieldTakeNode tmpNode = (FieldTakeNode) node;
+            String fieldName = tmpNode.getFieldName();
+            return recordData.getField(fieldName);
+        } else if (node instanceof ListTakeNode) {
+            ListTakeNode tmpNode = (ListTakeNode) node;
+            return tmpNode.getValues();
         }
-        return null;
+        throw new RuntimeException("Unsupported node type: " + node.getClass().getName());
     }
 
 }

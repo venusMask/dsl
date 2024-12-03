@@ -9,7 +9,12 @@ public enum ValueType {
 
     ID(0, "ID"),
 
-    FIELD(1, "FIELD");
+    FIELD(1, "FIELD"),
+
+    DIRECT(2, "DIRECT"),
+
+    LIST(3, "LIST"),
+    ;
 
     private final int code;
 

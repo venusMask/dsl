@@ -9,9 +9,9 @@ import org.venus.dsl.ast.DslBaseVisitor;
 import org.venus.dsl.ast.DslParser;
 import org.venus.dsl.parse.node.type.OperationType;
 import org.venus.dsl.parse.node.type.ValueType;
+import org.venus.dsl.parse.node.value.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -84,12 +84,6 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
-    public DictMappingNode visitDictMapping(DslParser.DictMappingContext ctx) {
-        String dictName = ctx.STRING_SQUARE_BRACKETS().getText();
-        return DictMappingNode.builder().dictName(dictName).build();
-    }
-
-    @Override
     public AssertionNode visitAssertion(DslParser.AssertionContext ctx) {
         List<DslParser.MatchContext> matchContexts = ctx.match();
         ArrayList<MatchNode> matchNodes = new ArrayList<>(matchContexts.size());
@@ -108,6 +102,91 @@ public class AstParse extends DslBaseVisitor<Node> {
                 .build();
     }
 
+    private ArrayList<DictMappingNode>
+    loadDictNodes(List<DslParser.DictMappingContext> dictContexts) {
+        if (dictContexts == null || dictContexts.isEmpty()) {
+            return null;
+        }
+        ArrayList<DictMappingNode> dictNodes = new ArrayList<>(dictContexts.size());
+        for (DslParser.DictMappingContext dictContext : dictContexts) {
+            DictMappingNode dictNode = (DictMappingNode) visit(dictContext);
+            dictNodes.add(dictNode);
+        }
+        return dictNodes;
+    }
+
+    private RuleLogicNode
+    visitRuleLogicContext(DslParser.RuleLogicContext context,
+                          OperationType operationType) {
+        DslParser.ValueTakeContext lhs = context.getRuleContext(DslParser.ValueTakeContext.class, 0);
+        DslParser.ValueTakeContext rhs = context.getRuleContext(DslParser.ValueTakeContext.class, 1);
+        ValueTakeNode lhsNode = (ValueTakeNode) visit(lhs);
+        ValueTakeNode rhsNode = (ValueTakeNode) visit(rhs);
+        ArrayList<DictMappingNode> dictNodes = loadDictNodes(context.getRuleContexts(DslParser.DictMappingContext.class));
+        return RuleLogicNode.builder()
+                .lhs(lhsNode)
+                .rhs(rhsNode)
+                .dictMappings(dictNodes)
+                .operationType(operationType)
+                .build();
+    }
+
+    @Override
+    public DictMappingNode visitDictMapping(DslParser.DictMappingContext ctx) {
+        String dictName = ctx.STRING_SQUARE_BRACKETS().getText();
+        return DictMappingNode.builder().dictName(dictName).build();
+    }
+
+    @Override
+    public Node visitEqRuleExpr(DslParser.EqRuleExprContext ctx) {
+        return visitRuleLogicContext(ctx, OperationType.EQUAL);
+    }
+
+    @Override
+    public Node visitNeRuleExpr(DslParser.NeRuleExprContext ctx) {
+        return visitRuleLogicContext(ctx, OperationType.NotEqual);
+    }
+
+    @Override
+    public Node visitInRuleExpr(DslParser.InRuleExprContext ctx) {
+        return visitRuleLogicContext(ctx, OperationType.IN);
+    }
+
+    @Override
+    public Node visitAddRuleExpr(DslParser.AddRuleExprContext ctx) {
+        return visitRuleLogicContext(ctx, OperationType.ADD);
+    }
+
+    @Override
+    public Node visitSubRuleExpr(DslParser.SubRuleExprContext ctx) {
+        return visitRuleLogicContext(ctx, OperationType.SUBTRACT);
+    }
+
+    @Override
+    public Node visitMulRuleExpr(DslParser.MulRuleExprContext ctx) {
+        return visitRuleLogicContext(ctx, OperationType.MULTIPLY);
+    }
+
+    @Override
+    public Node visitDivRuleExpr(DslParser.DivRuleExprContext ctx) {
+        return visitRuleLogicContext(ctx, OperationType.DIVIDE);
+    }
+
+    @Override
+    public Node visitGtRuleExpr(DslParser.GtRuleExprContext ctx) {
+        return visitRuleLogicContext(ctx, OperationType.GT);
+    }
+
+    @Override
+    public Node visitGeRuleExpr(DslParser.GeRuleExprContext ctx) {
+        return visitRuleLogicContext(ctx, OperationType.GE);
+    }
+
+    @Override
+    public Node visitContainsRuleExpr(DslParser.ContainsRuleExprContext ctx) {
+        return visitRuleLogicContext(ctx, OperationType.CONTAINS);
+    }
+
     @Override
     public MatchNode visitMatch(DslParser.MatchContext ctx) {
         LogicExprNode logicExprNode = (LogicExprNode) visit(ctx.logicExpr());
@@ -119,7 +198,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
-    public LogicExprNode visitRuleItemExpr(DslParser.RuleItemExprContext ctx) {
+    public Node visitRuleCodeLogicExpr(DslParser.RuleCodeLogicExprContext ctx) {
         String ruleCode = ctx.ruleCode.getText();
         return ValueLogicExprNode.builder()
                 .ruleCode(ruleCode)
@@ -127,7 +206,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
-    public LogicExprNode visitParenLogicExpr(DslParser.ParenLogicExprContext ctx) {
+    public Node visitNestLogicExpr(DslParser.NestLogicExprContext ctx) {
         LogicExprNode child = (LogicExprNode) visit(ctx.logicExpr());
         return NestedLogicExprNode.builder()
                 .child(child)
@@ -135,7 +214,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
-    public LogicExprNode visitAndExpr(DslParser.AndExprContext ctx) {
+    public LogicExprNode visitAndLogicExpr(DslParser.AndLogicExprContext ctx) {
         LogicExprNode leftValue = (LogicExprNode) visit(ctx.lhs);
         LogicExprNode rightValue = (LogicExprNode) visit(ctx.rhs);
         return StandardLogicExprNode.builder()
@@ -146,14 +225,14 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
-    public Node visitNotExpr(DslParser.NotExprContext ctx) {
+    public Node visitNotLogicExpr(DslParser.NotLogicExprContext ctx) {
         return ExcludeLogicExprNode.builder()
-                .logicExpr((LogicExprNode)visit(ctx.rhs))
+                .logicExpr((LogicExprNode) visit(ctx.rhs))
                 .build();
     }
 
     @Override
-    public Node visitOrExpr(DslParser.OrExprContext ctx) {
+    public Node visitOrLogicExpr(DslParser.OrLogicExprContext ctx) {
         LogicExprNode leftValue = (LogicExprNode) visit(ctx.lhs);
         LogicExprNode rightValue = (LogicExprNode) visit(ctx.rhs);
         return StandardLogicExprNode.builder()
@@ -164,73 +243,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
-    public RuleLogicNode visitEqExpr(DslParser.EqExprContext ctx) {
-        DslParser.ValueTakeContext leftValueCxt = ctx.lhs;
-        ValueTakeNode leftNode = (ValueTakeNode) visit(leftValueCxt);
-        ArrayList<DictMappingNode> dictNodes = loadDictNodes(ctx.dictMapping());
-        DslParser.ValueContext valueContext = ctx.rhs;
-        String rightNode = trimString(valueContext.getText());
-        return RuleLogicNode.builder()
-                .valueTake(leftNode)
-                .dictMappings(dictNodes)
-                .rightValues(Collections.singletonList(rightNode))
-                .operationType(OperationType.EQUAL)
-                .build();
-    }
-
-    @Override
-    public RuleLogicNode visitNeExpr(DslParser.NeExprContext ctx) {
-        DslParser.ValueTakeContext leftValueCxt = ctx.lhs;
-        ValueTakeNode leftNode = (ValueTakeNode) visit(leftValueCxt);
-        ArrayList<DictMappingNode> dictNodes = loadDictNodes(ctx.dictMapping());
-        DslParser.ValueContext valueContext = ctx.rhs;
-        String rightNode = trimString(valueContext.getText());
-        return RuleLogicNode.builder()
-                .valueTake(leftNode)
-                .dictMappings(dictNodes)
-                .rightValues(Collections.singletonList(rightNode))
-                .operationType(OperationType.NotEqual)
-                .build();
-    }
-
-    private ArrayList<DictMappingNode> loadDictNodes(List<DslParser.DictMappingContext> dictContexts) {
-        if(dictContexts == null || dictContexts.isEmpty()) {
-            return null;
-        }
-        ArrayList<DictMappingNode> dictNodes = new ArrayList<>(dictContexts.size());
-        for (DslParser.DictMappingContext dictContext : dictContexts) {
-            DictMappingNode dictNode = (DictMappingNode) visit(dictContext);
-            dictNodes.add(dictNode);
-        }
-        return dictNodes;
-    }
-
-    @Override
-    public RuleLogicNode visitInExpr(DslParser.InExprContext ctx) {
-        DslParser.ValueTakeContext leftValueCxt = ctx.lhs;
-        ValueTakeNode leftNode = (ValueTakeNode) visit(leftValueCxt);
-        ArrayList<DictMappingNode> dictNodes = loadDictNodes(ctx.dictMapping());
-        DslParser.ValueContext valueContext = ctx.rhs;
-        ArrayList<String> rightValues = new ArrayList<>();
-        if(valueContext.DIGIT() != null) {
-            rightValues.add(trimString(valueContext.DIGIT().getText()));
-        }
-        List<TerminalNode> string = valueContext.STRING();
-        if(string != null && !string.isEmpty()) {
-            for (TerminalNode terminalNode : string) {
-                rightValues.add(trimString(terminalNode.getText()));
-            }
-        }
-        return RuleLogicNode.builder()
-                .valueTake(leftNode)
-                .dictMappings(dictNodes)
-                .rightValues(rightValues)
-                .operationType(OperationType.IN)
-                .build();
-    }
-
-    @Override
-    public OutputExprNode visitFunctionCallSymbol(DslParser.FunctionCallSymbolContext ctx) {
+    public OutputExprNode visitFunctionOutputExpr(DslParser.FunctionOutputExprContext ctx) {
         String functionName = ctx.functionName.getText();
         List<DslParser.OutputExprContext> contexts = ctx.outputExpr();
         ArrayList<OutputExprNode> nodes = new ArrayList<>(contexts.size());
@@ -244,7 +257,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
-    public Node visitNumberVarExpr(DslParser.NumberVarExprContext ctx) {
+    public Node visitNumberOutputExpr(DslParser.NumberOutputExprContext ctx) {
         String number = ctx.DIGIT().getText();
         return ValueOutputNode.builder()
                 .outputValue(number)
@@ -252,7 +265,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
-    public Node visitStringVarExpr(DslParser.StringVarExprContext ctx) {
+    public Node visitStringOutputExpr(DslParser.StringOutputExprContext ctx) {
         String outputString = ctx.STRING().getText();
         outputString = trimString(outputString);
         return ValueOutputNode.builder()
@@ -261,7 +274,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
-    public Node visitFieldVarExpr(DslParser.FieldVarExprContext ctx) {
+    public Node visitFieldOutputExpr(DslParser.FieldOutputExprContext ctx) {
         String fieldTake = ctx.FIELD_TAKE().getText();
         fieldTake = fieldTake.substring(2, fieldTake.length() - 1);
         return FieldOutputNode.builder()
@@ -270,14 +283,14 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
-    public Node visitParenPolyExpr(DslParser.ParenPolyExprContext ctx) {
+    public Node visitNestOutputExpr(DslParser.NestOutputExprContext ctx) {
         return NestedOutputNode.builder()
                 .child((OutputExprNode) visit(ctx.outputExpr()))
                 .build();
     }
 
     @Override
-    public OutputExprNode visitMulExpr(DslParser.MulExprContext ctx) {
+    public OutputExprNode visitMulOutputExpr(DslParser.MulOutputExprContext ctx) {
         return StandardOutputNode.builder()
                 .leftOutputExpr((OutputExprNode) visit(ctx.lhs))
                 .rightOutputExpr((OutputExprNode) visit(ctx.rhs))
@@ -286,7 +299,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
-    public Node visitDivExpr(DslParser.DivExprContext ctx) {
+    public Node visitDivOutputExpr(DslParser.DivOutputExprContext ctx) {
         return StandardOutputNode.builder()
                 .leftOutputExpr((OutputExprNode) visit(ctx.lhs))
                 .rightOutputExpr((OutputExprNode) visit(ctx.rhs))
@@ -295,7 +308,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
-    public Node visitAddExpr(DslParser.AddExprContext ctx) {
+    public Node visitAddOutputExpr(DslParser.AddOutputExprContext ctx) {
         return StandardOutputNode.builder()
                 .leftOutputExpr((OutputExprNode) visit(ctx.lhs))
                 .rightOutputExpr((OutputExprNode) visit(ctx.rhs))
@@ -304,7 +317,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
-    public Node visitSubExpr(DslParser.SubExprContext ctx) {
+    public Node visitSubOutputExpr(DslParser.SubOutputExprContext ctx) {
         return StandardOutputNode.builder()
                 .leftOutputExpr((OutputExprNode) visit(ctx.lhs))
                 .rightOutputExpr((OutputExprNode) visit(ctx.rhs))
@@ -315,9 +328,9 @@ public class AstParse extends DslBaseVisitor<Node> {
     @Override
     public ValueTakeNode visitRuleTake(DslParser.RuleTakeContext ctx) {
         String id = ctx.ID().getText();
-        return ValueTakeNode.builder()
-                .type(ValueType.ID)
-                .value(id)
+        return RuleTakeNode.builder()
+                .ruleID(id)
+                .valueType(ValueType.ID)
                 .build();
     }
 
@@ -325,15 +338,50 @@ public class AstParse extends DslBaseVisitor<Node> {
     public Node visitFieldTake(DslParser.FieldTakeContext ctx) {
         String fieldTake = ctx.getText();
         fieldTake = fieldTake.substring(2, fieldTake.length() - 1);
-        return ValueTakeNode.builder()
-                .type(ValueType.FIELD)
-                .value(fieldTake)
+        return FieldTakeNode.builder()
+                .valueType(ValueType.FIELD)
+                .fieldName(fieldTake)
                 .build();
     }
 
-    private String trimString(String str) {
+    @Override
+    public Node visitNumberTake(DslParser.NumberTakeContext ctx) {
+        String digit = ctx.DIGIT().getText();
+        return DirectTakeNode.builder()
+                .directValue(digit)
+                .valueType(ValueType.DIRECT)
+                .build();
+    }
+
+    @Override
+    public Node visitStringTake(DslParser.StringTakeContext ctx) {
+        String text = ctx.STRING().getText();
+        text = trimString(text);
+        return DirectTakeNode.builder()
+                .directValue(text)
+                .valueType(ValueType.DIRECT)
+                .build();
+    }
+
+    @Override
+    public Node visitListTake(DslParser.ListTakeContext ctx) {
+        List<TerminalNode> terminalNodes = ctx.STRING();
+        ArrayList<String> list = new ArrayList<>(terminalNodes.size());
+        for (TerminalNode terminalNode : terminalNodes) {
+            String text = terminalNode.getText();
+            text = trimString(text);
+            list.add(text);
+        }
+        return ListTakeNode.builder()
+                .valueType(ValueType.LIST)
+                .values(list)
+                .build();
+    }
+
+    private String
+    trimString(String str) {
         String trim = str.trim();
-        if(trim.isEmpty()) {
+        if (trim.isEmpty()) {
             return "";
         } else {
             return trim.substring(1, str.length() - 1);

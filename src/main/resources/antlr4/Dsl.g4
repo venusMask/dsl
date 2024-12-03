@@ -1,10 +1,9 @@
 grammar Dsl;
 
 @header {
-package org.venus.dsl.sql.ast;
+package org.venus.dsl.ast;
 }
 
-// 不能使用rule作为名称,否则生成的RuleContext会跟内置的RuleContext冲突导致报错
 dsl             : ruleGroup                                     #singleRule
                 | ruleDeclare ruleGroup+ '{' assertion '}'      #multipleRule
                 ;
@@ -16,9 +15,16 @@ ruleDeclare     : ruleCode = ID ruleName = STRING;
 ruleDefinition  : ruleCode = ID ruleLogic (SEMICOLON ruleLogic)*;
 
 ruleLogic
-                :  lhs = valueTake  dictMapping* op = EQ  rhs = value                # eqExpr
-                |  lhs = valueTake  dictMapping* op = NE  rhs = value                # neExpr
-                |  lhs = valueTake  dictMapping* op = IN  rhs = value                # inExpr
+                :  lhs = valueTake  dictMapping* op = EQ         rhs = valueTake     #EqRuleExpr
+                |  lhs = valueTake  dictMapping* op = NE         rhs = valueTake     #NeRuleExpr
+                |  lhs = valueTake  dictMapping* op = IN         rhs = valueTake     #InRuleExpr
+                |  lhs = valueTake  dictMapping* op = '+'        rhs = valueTake     #AddRuleExpr
+                |  lhs = valueTake  dictMapping* op = '-'        rhs = valueTake     #SubRuleExpr
+                |  lhs = valueTake  dictMapping* op = '*'        rhs = valueTake     #MulRuleExpr
+                |  lhs = valueTake  dictMapping* op = '/'        rhs = valueTake     #DivRuleExpr
+                |  lhs = valueTake  dictMapping* op = '>'        rhs = valueTake     #GtRuleExpr
+                |  lhs = valueTake  dictMapping* op = '>='       rhs = valueTake     #GeRuleExpr
+                |  lhs = valueTake  dictMapping* op = CONTAINS   rhs = valueTake     #ContainsRuleExpr
                 ;
 
 dictMapping     : '->' STRING_SQUARE_BRACKETS;
@@ -27,38 +33,33 @@ assertion       : match+ ('其他输出' outputExpr)*;
 
 match           : '满足'  logicExpr '输出'  outputExpr;
 
-value           : DIGIT
-                | STRING
-                | '{' STRING (',' STRING)* '}'
-                ;
-
-inValue         : '{' value (',' value)* '}'
+valueTake
+                :'(' ID ')'       #RuleTake
+                | '（' ID '）'     #RuleTake
+                | FIELD_TAKE      #FieldTake
+                | DIGIT           #NumberTake
+                | STRING          #StringTake
+                | '{' STRING (',' STRING)* '}' #ListTake
                 ;
 
 logicExpr
-                : op = NOT rhs = logicExpr                                # NotExpr
-                | lhs = logicExpr op = AND rhs = logicExpr                # AndExpr
-                | lhs = logicExpr op = OR  rhs = logicExpr                # OrExpr
-                | LP logicExpr RP                                         # ParenLogicExpr
-                | ruleCode = ID                                           # RuleItemExpr
+                : op = NOT rhs = logicExpr                                #NotLogicExpr
+                | lhs = logicExpr op = AND rhs = logicExpr                #AndLogicExpr
+                | lhs = logicExpr op = OR  rhs = logicExpr                #OrLogicExpr
+                | LP logicExpr RP                                         #NestLogicExpr
+                | ruleCode = ID                                           #RuleCodeLogicExpr
                 ;
 
 outputExpr
-                : functionName = ID  '(' outputExpr* ')'                # FunctionCallSymbol
-                | lhs = outputExpr op = '*' rhs = outputExpr            # MulExpr
-                | lhs = outputExpr op = '/' rhs = outputExpr            # DivExpr
-                | lhs = outputExpr op = '+' rhs = outputExpr            # AddExpr
-                | lhs = outputExpr op = '-' rhs = outputExpr            # SubExpr
-                | DIGIT                                                 # NumberVarExpr
-                | STRING                                                # StringVarExpr
-                | FIELD_TAKE                                            # FieldVarExpr
-                | '(' outputExpr ')'                                    # ParenPolyExpr
-                ;
-
-valueTake
-                :'(' ID ')'       # RuleTake
-                | '（' ID '）'     # RuleTake
-                | FIELD_TAKE      # FieldTake
+                : functionName = ID  '(' outputExpr* ')'                #FunctionOutputExpr
+                | lhs = outputExpr op = '*' rhs = outputExpr            #MulOutputExpr
+                | lhs = outputExpr op = '/' rhs = outputExpr            #DivOutputExpr
+                | lhs = outputExpr op = '+' rhs = outputExpr            #AddOutputExpr
+                | lhs = outputExpr op = '-' rhs = outputExpr            #SubOutputExpr
+                | DIGIT                                                 #NumberOutputExpr
+                | STRING                                                #StringOutputExpr
+                | FIELD_TAKE                                            #FieldOutputExpr
+                | '(' outputExpr ')'                                    #NestOutputExpr
                 ;
 
 /* 词法部分只设计通用词, 并不考虑词的具体含义, 具体词的含义在上面语法部分定义 */
@@ -68,6 +69,7 @@ LP                      : '(';
 RP                      : ')';
 EQ                      : '=' | '==' | '等于';
 NE                      : '≠' | '!=' | '不等于';
+CONTAINS                : 'contains';
 IN                      : 'in' | '->' | '属于';
 NOT                     : '!' | 'not' | 'NOT';
 AND                     : '&' | 'and' | 'AND';
