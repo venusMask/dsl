@@ -50,6 +50,10 @@ public class OutputExprVisitor implements BaseVisitor {
             NestedOutputNode tmpNode = (NestedOutputNode) node;
             OutputExprNode child = tmpNode.getChild();
             return new OutputExprVisitor(child, analyze).visit(recordData);
+        } else if (node instanceof FieldOutputNode) {
+            FieldOutputNode tmpNode = (FieldOutputNode) node;
+            String fieldName = tmpNode.getFieldName();
+            return recordData.getField(fieldName);
         }
         return null;
     }

@@ -17,4 +17,14 @@ public class BaseTest extends TestCase {
         System.out.println(visitor.visit(recordData));
     }
 
+    public void testFieldTakeInOutput() throws Exception {
+        String rule = "rule \"姓名生产规则\"\n" +
+                "x1 ${姓名} != \"null\"\n" +
+                "满足 x1 输出 ${姓名}";
+        HashMapData recordData = new HashMapData();
+        recordData.setField("姓名", "姓名aaa");
+        Object result = Analyze.parse(rule).visit(recordData);
+        assertEquals(result, "姓名aaa");
+    }
+
 }

@@ -264,8 +264,8 @@ public class AstParse extends DslBaseVisitor<Node> {
     public Node visitFieldVarExpr(DslParser.FieldVarExprContext ctx) {
         String fieldTake = ctx.FIELD_TAKE().getText();
         fieldTake = fieldTake.substring(2, fieldTake.length() - 1);
-        return ValueOutputNode.builder()
-                .outputValue(fieldTake)
+        return FieldOutputNode.builder()
+                .fieldName(fieldTake)
                 .build();
     }
 
