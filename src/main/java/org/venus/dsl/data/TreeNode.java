@@ -28,4 +28,8 @@ public class TreeNode {
         this.children.addAll(children);
     }
 
+    public static TreeNode build(String fieldName, String fieldValue) {
+        return new TreeNode(fieldName, fieldValue);
+    }
+
 }

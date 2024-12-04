@@ -25,6 +25,7 @@ ruleLogic
                 |  lhs = valueTake  dictMapping* op = '>'        rhs = valueTake     #GtRuleExpr
                 |  lhs = valueTake  dictMapping* op = '>='       rhs = valueTake     #GeRuleExpr
                 |  lhs = valueTake  dictMapping* op = CONTAINS   rhs = valueTake     #ContainsRuleExpr
+                |  lhs = valueTake  dictMapping* op = NOTCONTAINS   rhs = valueTake  #NotContainsRuleExpr
                 ;
 
 dictMapping     : '->' STRING_SQUARE_BRACKETS;
@@ -70,6 +71,7 @@ RP                      : ')';
 EQ                      : '=' | '==' | '等于';
 NE                      : '≠' | '!=' | '不等于';
 CONTAINS                : 'contains';
+NOTCONTAINS             : 'not_contains';
 IN                      : 'in' | '->' | '属于';
 NOT                     : '!' | 'not' | 'NOT';
 AND                     : '&' | 'and' | 'AND';

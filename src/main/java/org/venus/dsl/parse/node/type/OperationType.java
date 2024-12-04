@@ -31,9 +31,11 @@ public enum OperationType {
 
     CONTAINS(12, "CONTAINS"),
 
-    GE(12, "ge"),
+    GE(12, "GE"),
 
-    GT(13, "gt"),
+    GT(13, "GT"),
+
+    NotContains(14, "NOT_CONTAINS"),
     ;
 
     private final int code;

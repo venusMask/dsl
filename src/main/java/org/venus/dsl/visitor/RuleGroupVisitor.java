@@ -16,7 +16,7 @@ public class RuleGroupVisitor implements BaseVisitor {
     @Override
     public Object visit(RecordData recordData) {
         AssertionNode assertion = node.getAssertion();
-        return new AssertionVisitor(assertion, analyze).visit(recordData);
+        return new AssertionVisitor(assertion, analyze, node.getRuleDeclare().getRuleCode()).visit(recordData);
     }
 
 }

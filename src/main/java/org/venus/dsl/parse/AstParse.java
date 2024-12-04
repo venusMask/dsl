@@ -79,7 +79,7 @@ public class AstParse extends DslBaseVisitor<Node> {
         }
         return RuleDefinitionNode.builder()
                 .ruleCode(ruleCode)
-                .operations(nodes)
+                .ruleLogics(nodes)
                 .build();
     }
 
@@ -115,9 +115,8 @@ public class AstParse extends DslBaseVisitor<Node> {
         return dictNodes;
     }
 
-    private RuleLogicNode
-    visitRuleLogicContext(DslParser.RuleLogicContext context,
-                          OperationType operationType) {
+    private RuleLogicNode visitRuleLogicContext(DslParser.RuleLogicContext context,
+                                                OperationType operationType) {
         DslParser.ValueTakeContext lhs = context.getRuleContext(DslParser.ValueTakeContext.class, 0);
         DslParser.ValueTakeContext rhs = context.getRuleContext(DslParser.ValueTakeContext.class, 1);
         ValueTakeNode lhsNode = (ValueTakeNode) visit(lhs);
@@ -185,6 +184,11 @@ public class AstParse extends DslBaseVisitor<Node> {
     @Override
     public Node visitContainsRuleExpr(DslParser.ContainsRuleExprContext ctx) {
         return visitRuleLogicContext(ctx, OperationType.CONTAINS);
+    }
+
+    @Override
+    public Node visitNotContainsRuleExpr(DslParser.NotContainsRuleExprContext ctx) {
+        return visitRuleLogicContext(ctx, OperationType.NotContains);
     }
 
     @Override
@@ -378,8 +382,7 @@ public class AstParse extends DslBaseVisitor<Node> {
                 .build();
     }
 
-    private String
-    trimString(String str) {
+    private String trimString(String str) {
         String trim = str.trim();
         if (trim.isEmpty()) {
             return "";

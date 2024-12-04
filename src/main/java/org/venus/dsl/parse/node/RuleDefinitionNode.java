@@ -11,13 +11,13 @@ public class RuleDefinitionNode extends Node {
 
     private String ruleCode;
 
-    private List<RuleLogicNode> operations;
+    private List<RuleLogicNode> ruleLogics;
 
     public RuleDefinitionNode(String ruleCode,
-                              List<RuleLogicNode> operations) {
+                              List<RuleLogicNode> ruleLogics) {
         this.ruleCode = ruleCode;
-        this.operations = operations;
-        this.operations.forEach(operation -> {
+        this.ruleLogics = ruleLogics;
+        this.ruleLogics.forEach(operation -> {
             operation.setParent(this);
             this.children.add(operation);
         });

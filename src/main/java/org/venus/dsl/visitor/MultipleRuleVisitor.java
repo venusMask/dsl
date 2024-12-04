@@ -16,7 +16,7 @@ public class MultipleRuleVisitor implements BaseVisitor {
     @Override
     public Object visit(RecordData recordData) {
         AssertionNode assertionNode = node.getAssertion();
-        return new AssertionVisitor(assertionNode, analyze).visit(recordData);
+        return new AssertionVisitor(assertionNode, analyze, node.getRuleDeclare().getRuleCode()).visit(recordData);
     }
 
 }

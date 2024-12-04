@@ -18,7 +18,7 @@ public class RuleDefinitionVisitor implements BaseVisitor {
     @Override
     public Boolean visit(RecordData recordData) {
         boolean flag = true;
-        List<RuleLogicNode> operations = node.getOperations();
+        List<RuleLogicNode> operations = node.getRuleLogics();
         for (RuleLogicNode operation : operations) {
             BaseVisitor visitor = new RuleLogicVisitor(operation, analyze);
             Object result = visitor.visit(recordData);

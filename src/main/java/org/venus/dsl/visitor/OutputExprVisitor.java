@@ -53,7 +53,7 @@ public class OutputExprVisitor implements BaseVisitor {
         } else if (node instanceof FieldOutputNode) {
             FieldOutputNode tmpNode = (FieldOutputNode) node;
             String fieldName = tmpNode.getFieldName();
-            return recordData.getField(fieldName);
+            return recordData.getValue(fieldName);
         }
         return null;
     }

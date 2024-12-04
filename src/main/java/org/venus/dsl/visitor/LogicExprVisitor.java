@@ -21,6 +21,8 @@ public class LogicExprVisitor implements BaseVisitor {
 
     private final Analyze analyze;
 
+    private final String ruleGroupID;
+
     @Override
     public Boolean visit(RecordData recordData) {
         // 直接获取表达式的结果
@@ -30,40 +32,39 @@ public class LogicExprVisitor implements BaseVisitor {
             // 根据是单结构表达式或者是多结构表达式此处需要处理的方式不同
              Boolean isSingleRule = analyze.getIsSingleRule();
             if(isSingleRule) {
-                RuleDefinitionNode ruleDefinitionNode = analyze.getRuleDefinitionNode(ruleCode);
+                RuleDefinitionNode ruleDefinitionNode = analyze.getRuleDefinitionNode(ruleGroupID,ruleCode);
                 return new RuleDefinitionVisitor(ruleDefinitionNode, analyze).visit(recordData);
             } else {
                 RuleGroupNode ruleGroup = analyze.getRuleGroup(ruleCode);
-                 analyze.setIsSingleRule(true);
+                analyze.setIsSingleRule(true);
                 Object ruleGroupValue = new RuleGroupVisitor(ruleGroup, analyze).visit(recordData);
-                 analyze.setIsSingleRule(false);
+                analyze.setIsSingleRule(false);
                 return Objects.equals(ruleGroupValue, "是");
             }
         } else if (node instanceof ExcludeLogicExprNode) {
             ExcludeLogicExprNode tmpNode = (ExcludeLogicExprNode) node;
-            BaseVisitor visitor = new LogicExprVisitor(tmpNode.getLogicExpr(), analyze);
+            BaseVisitor visitor = new LogicExprVisitor(tmpNode.getLogicExpr(), analyze, ruleGroupID);
             Object flag = visitor.visit(recordData);
             return !(boolean) flag;
         } else if (node instanceof NestedLogicExprNode) {
             NestedLogicExprNode tmpNode = (NestedLogicExprNode) node;
-            BaseVisitor visitor = new LogicExprVisitor(tmpNode.getChild(), analyze);
+            BaseVisitor visitor = new LogicExprVisitor(tmpNode.getChild(), analyze, ruleGroupID);
             Object flag = visitor.visit(recordData);
             return (boolean) flag;
         } else if (node instanceof StandardLogicExprNode) {
             StandardLogicExprNode tmpNode = (StandardLogicExprNode) node;
-            Boolean leftFlag = new LogicExprVisitor(tmpNode.getLeftLogicExpr(), analyze).visit(recordData);
+            Boolean leftFlag = new LogicExprVisitor(tmpNode.getLeftLogicExpr(), analyze, ruleGroupID).visit(recordData);
             OperationType operationType = tmpNode.getOperationType();
-            // 根据运算符的类型可以提前结束计算
             if(operationType == OperationType.AND) {
                 if(!leftFlag) {
                     return false;
                 }
-                return new LogicExprVisitor(tmpNode.getRightLogicExpr(), analyze).visit(recordData);
+                return new LogicExprVisitor(tmpNode.getRightLogicExpr(), analyze, ruleGroupID).visit(recordData);
             } else if (operationType == OperationType.OR) {
                 if(leftFlag) {
                     return true;
                 }
-                return new LogicExprVisitor(tmpNode.getRightLogicExpr(), analyze).visit(recordData);
+                return new LogicExprVisitor(tmpNode.getRightLogicExpr(), analyze, ruleGroupID).visit(recordData);
             }
         }
         return null;

@@ -1,6 +1,7 @@
 package org.venus.dsl.data;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TreeData implements RecordData {
@@ -44,7 +45,7 @@ public class TreeData implements RecordData {
     }
 
     @Override
-    public String getField(String fieldName) {
+    public String getValue(String fieldName) {
         ArrayDeque<TreeNode> deque = new ArrayDeque<>();
         deque.addLast(root);
         while (!deque.isEmpty()) {
@@ -61,6 +62,27 @@ public class TreeData implements RecordData {
             }
         }
         return null;
+    }
+
+    @Override
+    public List<String> getValues(String fieldName) {
+        ArrayList<String> res = new ArrayList<>();
+        ArrayDeque<TreeNode> deque = new ArrayDeque<>();
+        deque.addLast(root);
+        while (!deque.isEmpty()) {
+            TreeNode node = deque.removeFirst();
+            if(node.getFieldName().equals(fieldName)) {
+                res.add(node.getFieldValue());
+            } else {
+                if(node.getChildren() != null && !node.getChildren().isEmpty()) {
+                    List<TreeNode> children = node.getChildren();
+                    for (TreeNode treeNode : children) {
+                        deque.addLast(treeNode);
+                    }
+                }
+            }
+        }
+        return res;
     }
 
 }

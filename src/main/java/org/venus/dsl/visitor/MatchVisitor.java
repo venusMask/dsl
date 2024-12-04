@@ -14,14 +14,16 @@ public class MatchVisitor implements BaseVisitor {
 
     private final Analyze analyze;
 
+    private final String ruleGroupID;
+
     @Override
     public Object visit(RecordData recordData) {
         LogicExprNode logicExprNode = node.getLogicExpr();
-        LogicExprVisitor visitor = new LogicExprVisitor(logicExprNode, analyze);
+        LogicExprVisitor visitor = new LogicExprVisitor(logicExprNode, analyze, ruleGroupID);
         Boolean flag = visitor.visit(recordData);
         if(flag) {
-            OutputExprNode polyExprNode = node.getOutputExpr();
-            return new OutputExprVisitor(polyExprNode, analyze).visit(recordData);
+            OutputExprNode outputExpr = node.getOutputExpr();
+            return new OutputExprVisitor(outputExpr, analyze).visit(recordData);
         } else {
             return null;
         }

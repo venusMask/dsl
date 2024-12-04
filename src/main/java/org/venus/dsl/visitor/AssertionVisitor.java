@@ -16,12 +16,14 @@ public class AssertionVisitor implements BaseVisitor {
 
     private final Analyze analyze;
 
+    private final String ruleGroupID;
+
     @Override
     public Object visit(RecordData recordData) {
         List<MatchNode> matchNodes = node.getMatches();
         List<OutputExprNode> otherOutput = node.getOtherOutputs();
         for (MatchNode matchNode : matchNodes) {
-            Object matchResult = new MatchVisitor(matchNode, analyze).visit(recordData);
+            Object matchResult = new MatchVisitor(matchNode, analyze, ruleGroupID).visit(recordData);
             if(matchResult != null) {
                 return matchResult;
             }

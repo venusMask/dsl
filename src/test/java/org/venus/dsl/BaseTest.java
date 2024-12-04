@@ -8,6 +8,8 @@ import org.venus.dsl.data.TreeData;
 import org.venus.dsl.data.TreeNode;
 import org.venus.dsl.visitor.BaseVisitor;
 
+import static org.venus.dsl.RuleCase.chestCTExaminationRule;
+
 @Slf4j
 public class BaseTest extends TestCase {
 
@@ -62,6 +64,25 @@ public class BaseTest extends TestCase {
         TreeNode node3 = TreeDataTest.buildNode("个人史存在状态", "否定");
         data.addChild(node1, node3);
         Object result = Analyze.parse(rule).visit(data);
+        System.out.println(result);
+    }
+
+    public void testGeCase() throws Exception {
+        HashMapData hashMapData = new HashMapData();
+        hashMapData.setField("检查时间", "2024-12-04 12:12:12");
+        hashMapData.setField("就诊时间", "2024-12-03 12:12:12");
+        String rule =
+                "rule_1 \"是否行胸部CT检查\"\n" +
+                "r1 ${检查时间} >= ${就诊时间}\n" +
+                "满足 r1 输出 \"是\"\n" +
+                "其他输出 \"否\"";
+        Object resultData = Analyze.parse(rule).visit(hashMapData);
+        System.out.println(resultData);
+    }
+
+    public void testContains() throws Exception {
+        TreeData ctTreeData = TreeDataTest.buildCTTreeData();
+        Object result = Analyze.parse(chestCTExaminationRule).visit(ctTreeData);
         System.out.println(result);
     }
 

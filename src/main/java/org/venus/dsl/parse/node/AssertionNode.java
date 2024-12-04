@@ -3,6 +3,7 @@ package org.venus.dsl.parse.node;
 import lombok.Builder;
 import lombok.Getter;
 import org.venus.dsl.parse.node.output.OutputExprNode;
+import org.venus.dsl.visitor.BaseVisitor;
 
 import java.util.List;
 
@@ -27,4 +28,5 @@ public class AssertionNode extends Node {
             this.children.add(outputExprNode);
         });
     }
+
 }

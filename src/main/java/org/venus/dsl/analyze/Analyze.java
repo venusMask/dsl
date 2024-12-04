@@ -42,8 +42,8 @@ public class Analyze {
         }
     }
 
-    public RuleGroupNode getRuleGroup(String ruleCode) {
-        return ruleGroups.get(ruleCode);
+    public RuleGroupNode getRuleGroup(String ruleGroupCode) {
+        return ruleGroups.get(ruleGroupCode);
     }
 
     public RuleDefinitionNode getRuleDefinitionNode(String ruleGroupID,
