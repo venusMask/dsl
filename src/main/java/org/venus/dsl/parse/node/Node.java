@@ -6,6 +6,9 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 所有的语法节点
+ */
 public abstract class Node {
 
     @Getter
