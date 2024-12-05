@@ -2,12 +2,14 @@ package org.venus.dsl.parse.node;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.venus.dsl.parse.node.type.OperationType;
 import org.venus.dsl.parse.node.value.ValueTakeNode;
 
 import java.util.List;
 
 @Getter
+@ToString
 public class RuleLogicNode extends Node {
 
     @Setter

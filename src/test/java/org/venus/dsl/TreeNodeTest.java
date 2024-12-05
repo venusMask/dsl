@@ -30,7 +30,7 @@ public class TreeNodeTest extends TestCase {
             TreeNode n54 = TreeNode.build("诊断名称", "慢阻肺诊断");
                 TreeNode n541 = TreeNode.build("诊断存在状态", "确定");
                 n54.addChild(n541);
-            TreeNode n55 = TreeNode.build("诊断名称", "肺不张诊断");
+            TreeNode n55 = TreeNode.build("诊断名称", "肺不张诊断2");
                 TreeNode n551 = TreeNode.build("诊断存在状态", "疑似");
                 n55.addChild(n551);
         n5.addChild(n51);

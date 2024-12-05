@@ -1,16 +1,16 @@
 package org.venus.dsl.visitor;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.venus.dsl.analyze.Analyze;
 import org.venus.dsl.data.TreeNode;
-import org.venus.dsl.parse.node.DictMappingNode;
 import org.venus.dsl.parse.node.RuleLogicNode;
 import org.venus.dsl.parse.node.type.OperationType;
 import org.venus.dsl.parse.node.value.ValueTakeNode;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
+@Slf4j
 @AllArgsConstructor
 public class RuleLogicVisitor implements BaseVisitor {
 
@@ -23,26 +23,28 @@ public class RuleLogicVisitor implements BaseVisitor {
         OperationType operationType = node.getOperationType();
         List<TreeNode> lhsObj = getValueTakeObj(node.getLhs(), beginNode);
         List<TreeNode> rhsObj = getValueTakeObj(node.getRhs(), beginNode);
+        // 没有发现目标字段
+        if(lhsObj.isEmpty() || rhsObj.isEmpty()) {
+            return null;
+        }
         if (operationType == OperationType.EQUAL) {
-            List<TreeNode> equals = equals(lhsObj, rhsObj.get(0).getFieldValue());
+            List<TreeNode> equals = equals(lhsObj, rhsObj.get(0).getValue());
             if(!equals.isEmpty()) {
                 return equals;
             }
             return null;
         } else if (operationType == OperationType.NotEqual) {
-            List<TreeNode> equals = notEquals(lhsObj, rhsObj.get(0).getFieldValue());
+            List<TreeNode> equals = notEquals(lhsObj, rhsObj.get(0).getValue());
             if(!equals.isEmpty()) {
                 return equals;
             }
             return null;
         } else if (operationType == OperationType.IN) {
-            TreeNode leftNode = lhsObj.get(0);
-            for (TreeNode treeNode : rhsObj) {
-                if(treeNode.getFieldValue().equals(leftNode.getFieldValue())) {
-                    return lhsObj;
-                }
+            List<TreeNode> res = contains(lhsObj, rhsObj);
+            if(res.isEmpty()) {
+                return null;
             }
-            return null;
+            return res;
         } else if (operationType == OperationType.CONTAINS) {
             List<TreeNode> res = contains(lhsObj, rhsObj);
             if(res.isEmpty()) {
@@ -57,29 +59,29 @@ public class RuleLogicVisitor implements BaseVisitor {
                 return null;
             }
         } else if (operationType == OperationType.GT) {
-            String l = lhsObj.get(0).getFieldValue();
-            String r = rhsObj.get(0).getFieldValue();
+            String l = lhsObj.get(0).getValue();
+            String r = rhsObj.get(0).getValue();
             if(l.compareTo(r) > 0) {
                 return lhsObj;
             }
             return null;
         } else if (operationType == OperationType.GE) {
-            String l = lhsObj.get(0).getFieldValue();
-            String r = rhsObj.get(0).getFieldValue();
+            String l = lhsObj.get(0).getValue();
+            String r = rhsObj.get(0).getValue();
             if(l.compareTo(r) >= 0) {
                 return lhsObj;
             }
             return null;
         } else if (operationType == OperationType.LE) {
-            String l = lhsObj.get(0).getFieldValue();
-            String r = rhsObj.get(0).getFieldValue();
+            String l = lhsObj.get(0).getValue();
+            String r = rhsObj.get(0).getValue();
             if(l.compareTo(r) <= 0) {
                 return lhsObj;
             }
             return null;
         } else if (operationType == OperationType.LT) {
-            String l = lhsObj.get(0).getFieldValue();
-            String r = rhsObj.get(0).getFieldValue();
+            String l = lhsObj.get(0).getValue();
+            String r = rhsObj.get(0).getValue();
             if(l.compareTo(r) < 0) {
                 return lhsObj;
             }
@@ -97,7 +99,7 @@ public class RuleLogicVisitor implements BaseVisitor {
     private List<TreeNode> equals(List<TreeNode> lhsObj, String fieldValue) {
         ArrayList<TreeNode> res = new ArrayList<>();
         for (TreeNode treeNode : lhsObj) {
-            if(treeNode.getFieldValue().equals(fieldValue)) {
+            if(treeNode.getValue().equals(fieldValue)) {
                 res.add(treeNode);
             }
         }
@@ -107,7 +109,7 @@ public class RuleLogicVisitor implements BaseVisitor {
     private List<TreeNode> notEquals(List<TreeNode> lhsObj, String fieldValue) {
         ArrayList<TreeNode> res = new ArrayList<>();
         for (TreeNode treeNode : lhsObj) {
-            if(!treeNode.getFieldValue().equals(fieldValue)) {
+            if(!treeNode.getValue().equals(fieldValue)) {
                 res.add(treeNode);
             }
         }
@@ -118,7 +120,7 @@ public class RuleLogicVisitor implements BaseVisitor {
         ArrayList<TreeNode> res = new ArrayList<>();
         for (TreeNode rh : rhs) {
             for (TreeNode lh : lhs) {
-                if(Objects.equals(lh.getFieldValue(), rh.getFieldValue())) {
+                if(Objects.equals(lh.getValue(), rh.getValue())) {
                     res.add(lh);
                 }
             }

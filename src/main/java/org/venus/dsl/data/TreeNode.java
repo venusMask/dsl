@@ -9,15 +9,15 @@ import java.util.List;
 @Data
 public class TreeNode {
 
-    private String fieldName;
+    private String name;
 
-    private String fieldValue;
+    private String value;
 
     private List<TreeNode> children;
 
     public TreeNode(String fieldName, String fieldValue) {
-        this.fieldName = fieldName;
-        this.fieldValue = fieldValue;
+        this.name = fieldName;
+        this.value = fieldValue;
         this.children = new ArrayList<>();
     }
 
@@ -33,26 +33,13 @@ public class TreeNode {
         return new TreeNode(fieldName, fieldValue);
     }
 
-    public static TreeNode search(TreeNode root, String fieldName) {
-        ArrayDeque<TreeNode> deque = new ArrayDeque<>();
-        deque.addLast(root);
-        while (!deque.isEmpty()) {
-            TreeNode node = deque.poll();
-            if (node.fieldName.equals(fieldName)) {
-                return node;
-            }
-            node.children.forEach(deque::addLast);
-        }
-        return null;
-    }
-
     public static List<TreeNode> searchValues(TreeNode root, String fieldName) {
         ArrayList<TreeNode> res = new ArrayList<>();
         ArrayDeque<TreeNode> deque = new ArrayDeque<>();
         deque.addLast(root);
         while (!deque.isEmpty()) {
             TreeNode node = deque.poll();
-            if (node.fieldName.equals(fieldName)) {
+            if (node.name.equals(fieldName)) {
                 res.add(node);
             } else {
                 node.children.forEach(deque::addLast);

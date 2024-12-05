@@ -102,8 +102,12 @@ public class BaseTest extends TestCase {
                         "其他输出 \"没有匹配\"";
         Object result3 = Analyze.parse(rule3).visit(root);
         assertEquals(result3, "没有匹配");
+    }
 
-
+    public void testCTCase() throws Exception {
+        TreeNode root = TreeNodeTest.buildCTTreeData();
+        Object result = Analyze.parse(RuleCase.chestCTExaminationRule).visit(root);
+        System.out.println(result);
     }
 
 }

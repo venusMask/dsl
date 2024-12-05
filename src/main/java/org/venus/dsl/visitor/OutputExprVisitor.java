@@ -54,7 +54,7 @@ public class OutputExprVisitor implements BaseVisitor {
             FieldOutputNode tmpNode = (FieldOutputNode) node;
             String fieldName = tmpNode.getFieldName();
             List<TreeNode> values = TreeNode.searchValues(root, fieldName);
-            return values.get(0).getFieldValue();
+            return values.get(0).getValue();
         }
         return null;
     }
