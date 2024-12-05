@@ -36,6 +36,10 @@ public enum OperationType {
     GT(13, "GT"),
 
     NotContains(14, "NOT_CONTAINS"),
+
+    LE(15, "LE"),
+
+    LT(16, "LT"),
     ;
 
     private final int code;

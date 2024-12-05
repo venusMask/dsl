@@ -108,6 +108,20 @@ public interface DslVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitGeRuleExpr(DslParser.GeRuleExprContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code LtRuleExpr}
+	 * labeled alternative in {@link DslParser#ruleLogic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLtRuleExpr(DslParser.LtRuleExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code LeRuleExpr}
+	 * labeled alternative in {@link DslParser#ruleLogic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLeRuleExpr(DslParser.LeRuleExprContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code ContainsRuleExpr}
 	 * labeled alternative in {@link DslParser#ruleLogic}.
 	 * @param ctx the parse tree

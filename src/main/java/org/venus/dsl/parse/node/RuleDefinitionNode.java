@@ -17,10 +17,13 @@ public class RuleDefinitionNode extends Node {
                               List<RuleLogicNode> ruleLogics) {
         this.ruleCode = ruleCode;
         this.ruleLogics = ruleLogics;
-        this.ruleLogics.forEach(operation -> {
-            operation.setParent(this);
-            this.children.add(operation);
-        });
+        RuleLogicNode prev = null;
+        for (RuleLogicNode ruleLogic : this.ruleLogics) {
+            ruleLogic.setParent(this);
+            ruleLogic.setPrev(prev);
+            prev = ruleLogic;
+            this.children.add(ruleLogic);
+        }
     }
 
 }

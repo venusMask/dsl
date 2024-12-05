@@ -182,6 +182,16 @@ public class AstParse extends DslBaseVisitor<Node> {
     }
 
     @Override
+    public Node visitLtRuleExpr(DslParser.LtRuleExprContext ctx) {
+        return visitRuleLogicContext(ctx, OperationType.LT);
+    }
+
+    @Override
+    public Node visitLeRuleExpr(DslParser.LeRuleExprContext ctx) {
+        return visitRuleLogicContext(ctx, OperationType.LE);
+    }
+
+    @Override
     public Node visitContainsRuleExpr(DslParser.ContainsRuleExprContext ctx) {
         return visitRuleLogicContext(ctx, OperationType.CONTAINS);
     }

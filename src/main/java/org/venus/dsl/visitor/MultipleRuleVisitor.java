@@ -2,7 +2,7 @@ package org.venus.dsl.visitor;
 
 import lombok.AllArgsConstructor;
 import org.venus.dsl.parse.node.AssertionNode;
-import org.venus.dsl.data.RecordData;
+import org.venus.dsl.data.TreeNode;
 import org.venus.dsl.analyze.Analyze;
 import org.venus.dsl.parse.node.MultipleRuleNode;
 
@@ -14,9 +14,9 @@ public class MultipleRuleVisitor implements BaseVisitor {
     private final Analyze analyze;
 
     @Override
-    public Object visit(RecordData recordData) {
+    public Object visit(TreeNode TreeNode) {
         AssertionNode assertionNode = node.getAssertion();
-        return new AssertionVisitor(assertionNode, analyze, node.getRuleDeclare().getRuleCode()).visit(recordData);
+        return new AssertionVisitor(assertionNode, analyze, node.getRuleDeclare().getRuleCode()).visit(TreeNode);
     }
 
 }

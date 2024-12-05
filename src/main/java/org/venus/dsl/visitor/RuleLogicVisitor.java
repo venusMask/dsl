@@ -2,15 +2,14 @@ package org.venus.dsl.visitor;
 
 import lombok.AllArgsConstructor;
 import org.venus.dsl.analyze.Analyze;
-import org.venus.dsl.data.RecordData;
+import org.venus.dsl.data.TreeNode;
 import org.venus.dsl.parse.node.DictMappingNode;
 import org.venus.dsl.parse.node.RuleLogicNode;
 import org.venus.dsl.parse.node.type.OperationType;
 import org.venus.dsl.parse.node.value.ValueTakeNode;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class RuleLogicVisitor implements BaseVisitor {
@@ -19,97 +18,121 @@ public class RuleLogicVisitor implements BaseVisitor {
 
     private final Analyze analyze;
 
-    private Object getValueTakeObj(ValueTakeNode valueTakeNode,
-                                   RecordData recordData,
-                                   Boolean singleValue) {
-        ValueTakeVisitor visitor = new ValueTakeVisitor(valueTakeNode, analyze, singleValue);
-        Object fieldValue = visitor.visit(recordData);
-        if(Objects.nonNull(node.getDictMappings())) {
-            List<DictMappingNode> dictMappingNodes = node.getDictMappings();
-            for (DictMappingNode dictMappingNode : dictMappingNodes) {
-                fieldValue = new DictMappingVisitor(
-                        dictMappingNode,
-                        analyze,
-                        (String) fieldValue).visit(recordData);
-            }
-        }
-        return fieldValue;
-    }
-
-    private boolean contains(List<String> lhsList, List<String> rhsList) {
-        for (String rhs : rhsList) {
-            if(lhsList.contains(rhs)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean notContains(List<String> lhsList, List<String> rhsList) {
-        return !contains(lhsList, rhsList);
-    }
-
     @Override
-    @SuppressWarnings("unchecked")
-    public Object visit(RecordData recordData) {
+    public List<TreeNode> visit(TreeNode beginNode) {
         OperationType operationType = node.getOperationType();
-        boolean leftFlag = Boolean.TRUE;
-        boolean rightFlag = Boolean.TRUE;
-        if(operationType == OperationType.IN) {
-            rightFlag = Boolean.FALSE;
-        } else if (operationType == OperationType.CONTAINS
-            || operationType == OperationType.NotContains) {
-            leftFlag = Boolean.FALSE;
-            rightFlag = Boolean.FALSE;
-        }
-        Object lhsObj = getValueTakeObj(node.getLhs(), recordData, leftFlag);
-        Object rhsObj = getValueTakeObj(node.getRhs(), recordData, rightFlag);
+        List<TreeNode> lhsObj = getValueTakeObj(node.getLhs(), beginNode);
+        List<TreeNode> rhsObj = getValueTakeObj(node.getRhs(), beginNode);
         if (operationType == OperationType.EQUAL) {
-            return Objects.equals(lhsObj, rhsObj);
+            List<TreeNode> equals = equals(lhsObj, rhsObj.get(0).getFieldValue());
+            if(!equals.isEmpty()) {
+                return equals;
+            }
+            return null;
         } else if (operationType == OperationType.NotEqual) {
-            return !Objects.equals(lhsObj, rhsObj);
+            List<TreeNode> equals = notEquals(lhsObj, rhsObj.get(0).getFieldValue());
+            if(!equals.isEmpty()) {
+                return equals;
+            }
+            return null;
         } else if (operationType == OperationType.IN) {
-            String lhsStr = lhsObj.toString();
-            for (String rightValue : (List<String>) rhsObj) {
-                if(Objects.equals(lhsStr, rightValue)) {
-                    return true;
+            TreeNode leftNode = lhsObj.get(0);
+            for (TreeNode treeNode : rhsObj) {
+                if(treeNode.getFieldValue().equals(leftNode.getFieldValue())) {
+                    return lhsObj;
                 }
             }
-            return false;
+            return null;
         } else if (operationType == OperationType.CONTAINS) {
-            if(rhsObj instanceof String) {
-                return contains((List<String>) lhsObj, Collections.singletonList((String) rhsObj));
-            } else if (rhsObj instanceof List) {
-                return contains((List<String>) lhsObj, (List<String>) rhsObj);
+            List<TreeNode> res = contains(lhsObj, rhsObj);
+            if(res.isEmpty()) {
+                return null;
             }
-            String errorMsg = String.format("Unsupported operation type: %s, Because data type: %s, %s",
-                    operationType,
-                    lhsObj.getClass(),
-                    rhsObj.getClass()
-            );
-            throw new IllegalStateException(errorMsg);
+            return res;
         } else if (operationType == OperationType.NotContains) {
-            if(rhsObj instanceof String) {
-                return notContains((List<String>) lhsObj, Collections.singletonList((String) rhsObj));
-            } else if (rhsObj instanceof List) {
-                return notContains((List<String>) lhsObj, (List<String>) rhsObj);
+            boolean flag = notContains(lhsObj, rhsObj);
+            if(flag) {
+                return Collections.emptyList();
+            } else {
+                return null;
             }
-            String errorMsg = String.format("Unsupported operation type: %s, Because data type: %s, %s",
-                    operationType,
-                    lhsObj.getClass(),
-                    rhsObj.getClass()
-            );
-            throw new IllegalStateException(errorMsg);
         } else if (operationType == OperationType.GT) {
-            String ls = lhsObj.toString();
-            String rs = rhsObj.toString();
-            return ls.compareTo(rs) > 0;
+            String l = lhsObj.get(0).getFieldValue();
+            String r = rhsObj.get(0).getFieldValue();
+            if(l.compareTo(r) > 0) {
+                return lhsObj;
+            }
+            return null;
         } else if (operationType == OperationType.GE) {
-            String ls = lhsObj.toString();
-            String rs = rhsObj.toString();
-            return ls.compareTo(rs) >= 0;
+            String l = lhsObj.get(0).getFieldValue();
+            String r = rhsObj.get(0).getFieldValue();
+            if(l.compareTo(r) >= 0) {
+                return lhsObj;
+            }
+            return null;
+        } else if (operationType == OperationType.LE) {
+            String l = lhsObj.get(0).getFieldValue();
+            String r = rhsObj.get(0).getFieldValue();
+            if(l.compareTo(r) <= 0) {
+                return lhsObj;
+            }
+            return null;
+        } else if (operationType == OperationType.LT) {
+            String l = lhsObj.get(0).getFieldValue();
+            String r = rhsObj.get(0).getFieldValue();
+            if(l.compareTo(r) < 0) {
+                return lhsObj;
+            }
+            return null;
         }
         throw new IllegalStateException("Unsupported operation type: " + operationType);
+    }
+
+    // TODO 实现字典映射转换
+    private List<TreeNode> getValueTakeObj(ValueTakeNode node,
+                                   TreeNode beginNode) {
+        return new ValueTakeVisitor(analyze, node).visit(beginNode);
+    }
+
+    private List<TreeNode> equals(List<TreeNode> lhsObj, String fieldValue) {
+        ArrayList<TreeNode> res = new ArrayList<>();
+        for (TreeNode treeNode : lhsObj) {
+            if(treeNode.getFieldValue().equals(fieldValue)) {
+                res.add(treeNode);
+            }
+        }
+        return res;
+    }
+
+    private List<TreeNode> notEquals(List<TreeNode> lhsObj, String fieldValue) {
+        ArrayList<TreeNode> res = new ArrayList<>();
+        for (TreeNode treeNode : lhsObj) {
+            if(!treeNode.getFieldValue().equals(fieldValue)) {
+                res.add(treeNode);
+            }
+        }
+        return res;
+    }
+
+    private List<TreeNode> contains(List<TreeNode> lhs, List<TreeNode> rhs) {
+        ArrayList<TreeNode> res = new ArrayList<>();
+        for (TreeNode rh : rhs) {
+            for (TreeNode lh : lhs) {
+                if(Objects.equals(lh.getFieldValue(), rh.getFieldValue())) {
+                    res.add(lh);
+                }
+            }
+        }
+        return res;
+    }
+
+    private boolean notContains(List<TreeNode> lhs, List<TreeNode> rhs) {
+        List<TreeNode> res = contains(lhs, rhs);
+        if(res.isEmpty()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

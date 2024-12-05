@@ -1,43 +1,14 @@
 package org.venus.dsl;
 
 import junit.framework.TestCase;
-import org.venus.dsl.data.TreeData;
 import org.venus.dsl.data.TreeNode;
 
-public class TreeDataTest extends TestCase {
+import java.util.List;
 
-    public static TreeNode buildNode(String fieldName, String fieldValue) {
-        return new TreeNode(fieldName, fieldValue);
-    }
+public class TreeNodeTest extends TestCase {
 
-    public void testTreeData() {
-        TreeData treeData = new TreeData();
-        TreeNode node1 = buildNode("field1", "value1");
-        TreeNode node2 = buildNode("field2", "value2");
-        TreeNode node3 = buildNode("field3", "value3");
-        TreeNode node4 = buildNode("field4", "value4");
-        TreeNode node5 = buildNode("field5", "value5");
-        TreeNode node6 = buildNode("field6", "value6");
-        TreeNode node7 = buildNode("field7", "value7");
-        TreeNode node8 = buildNode("field8", "value8");
-        TreeNode node9 = buildNode("field9", "value9");
-        TreeNode node10 = buildNode("field10", "value10");
-        TreeNode node11 = buildNode("field11", "value11");
-        treeData.addChild(node1);
-        treeData.addChild(node2);
-        treeData.addChild(node3);
-        treeData.addChild(node4);
-        treeData.addChild(node5);
-        treeData.addChild(node1, node6);
-        treeData.addChild(node2, node7);
-        treeData.addChild(node3, node8);
-        treeData.addChild(node4, node9);
-        treeData.addChild(node5, node10);
-        treeData.addChild(node6, node11);
-    }
-
-    public static TreeData buildCTTreeData() {
-        TreeData treeData = new TreeData();
+    public static TreeNode buildCTTreeData() {
+        TreeNode root = new TreeNode("检查", "检查");
         TreeNode n1 = TreeNode.build("检查项目类型", "CT");
         TreeNode n2 = TreeNode.build("检查项目类型存在状态", "确定");
         TreeNode n3 = TreeNode.build("检查部位", "肺部");
@@ -70,13 +41,31 @@ public class TreeDataTest extends TestCase {
         n5.addChild(n56);
         n5.addChild(n57);
         TreeNode n6 = TreeNode.build("病灶部位", "腹部");
-        treeData.addChild(n1);
-        treeData.addChild(n2);
-        treeData.addChild(n3);
-        treeData.addChild(n4);
-        treeData.addChild(n5);
-        treeData.addChild(n6);
-        return treeData;
+        root.addChild(n1);
+        root.addChild(n2);
+        root.addChild(n3);
+        root.addChild(n4);
+        root.addChild(n5);
+        root.addChild(n6);
+        TreeNode n7 = TreeNode.build("检查时间", "2024-12-04 12:12:12");
+        TreeNode n8 = TreeNode.build("就诊时间", "2024-12-03 12:12:13");
+        root.addChild(n7);
+        root.addChild(n8);
+        return root;
+    }
+
+    public void testSearchValues() {
+        TreeNode root = buildCTTreeData();
+        assertEquals(TreeNode.searchValues(root, "检查部位").size(), 2);
+        assertEquals(TreeNode.searchValues(root, "诊断名称").size(), 2);
+        assertEquals(TreeNode.searchValues(root, "病灶部位").size(), 2);
+        assertEquals(TreeNode.searchValues(root, "病灶存在状态").size(), 4);
+        List<TreeNode> values = TreeNode.searchValues(root, "病灶部位变化情况");
+        assertEquals(values.size(), 2);
+        for (TreeNode newRoot : values) {
+            List<TreeNode> tmpValues = TreeNode.searchValues(newRoot, "病灶存在状态");
+            assertEquals(tmpValues.size(), 1);
+        }
     }
 
 }

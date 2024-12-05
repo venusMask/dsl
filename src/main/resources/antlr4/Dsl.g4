@@ -24,6 +24,8 @@ ruleLogic
                 |  lhs = valueTake  dictMapping* op = '/'        rhs = valueTake     #DivRuleExpr
                 |  lhs = valueTake  dictMapping* op = '>'        rhs = valueTake     #GtRuleExpr
                 |  lhs = valueTake  dictMapping* op = '>='       rhs = valueTake     #GeRuleExpr
+                |  lhs = valueTake  dictMapping* op = '<'       rhs = valueTake      #LtRuleExpr
+                |  lhs = valueTake  dictMapping* op = '<='       rhs = valueTake     #LeRuleExpr
                 |  lhs = valueTake  dictMapping* op = CONTAINS   rhs = valueTake     #ContainsRuleExpr
                 |  lhs = valueTake  dictMapping* op = NOTCONTAINS   rhs = valueTake  #NotContainsRuleExpr
                 ;

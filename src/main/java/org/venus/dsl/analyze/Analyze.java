@@ -54,15 +54,6 @@ public class Analyze {
         return node;
     }
 
-    public RuleDefinitionNode getRuleDefinitionNode(String ruleDefinitionID) {
-        return ruleGroups
-                .values()
-                .stream()
-                .findFirst()
-                .map(ruleGroupNode -> getRuleDefinitionNode(ruleGroupNode.getRuleDeclare().getRuleCode(), ruleDefinitionID))
-                .orElse(null);
-    }
-
     public static BaseVisitor parse(String input) {
         CharStream charStream = CharStreams.fromString(input);
         DslLexer lexer = new DslLexer(charStream);

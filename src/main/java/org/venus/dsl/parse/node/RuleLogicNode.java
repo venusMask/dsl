@@ -1,23 +1,25 @@
 package org.venus.dsl.parse.node;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.venus.dsl.parse.node.type.OperationType;
 import org.venus.dsl.parse.node.value.ValueTakeNode;
 
 import java.util.List;
 
 @Getter
-@Builder
 public class RuleLogicNode extends Node {
 
-    private ValueTakeNode lhs;
+    @Setter
+    private RuleLogicNode prev;
 
-    private List<DictMappingNode> dictMappings;
+    private final ValueTakeNode lhs;
 
-    private OperationType operationType;
+    private final ValueTakeNode rhs;
 
-    private ValueTakeNode rhs;
+    private final OperationType operationType;
+
+    private final List<DictMappingNode> dictMappings;
 
     public RuleLogicNode(ValueTakeNode lhs,
                          List<DictMappingNode> dictMappings,
@@ -38,4 +40,42 @@ public class RuleLogicNode extends Node {
             }
         }
     }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private ValueTakeNode lhs;
+        private ValueTakeNode rhs;
+        private OperationType operationType;
+        private List<DictMappingNode> dictMappings;
+
+        public Builder lhs(ValueTakeNode lhs) {
+            this.lhs = lhs;
+            return this;
+        }
+
+        public Builder rhs(ValueTakeNode rhs) {
+            this.rhs = rhs;
+            return this;
+        }
+
+        public Builder operationType(OperationType operationType) {
+            this.operationType = operationType;
+            return this;
+        }
+
+        public Builder dictMappings(List<DictMappingNode> dictMappings) {
+            this.dictMappings = dictMappings;
+            return this;
+        }
+
+        // 构建方法
+        public RuleLogicNode build() {
+            return new RuleLogicNode(lhs, dictMappings, operationType, rhs);
+        }
+    }
+
 }

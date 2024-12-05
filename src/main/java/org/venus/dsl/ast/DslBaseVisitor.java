@@ -118,6 +118,20 @@ public class DslBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Ds
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitLtRuleExpr(DslParser.LtRuleExprContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitLeRuleExpr(DslParser.LeRuleExprContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitContainsRuleExpr(DslParser.ContainsRuleExprContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
