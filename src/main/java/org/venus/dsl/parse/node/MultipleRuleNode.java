@@ -1,22 +1,24 @@
 package org.venus.dsl.parse.node;
 
 import java.util.List;
-import lombok.Builder;
+
 import lombok.Getter;
+import org.venus.dsl.visitor.AstVisitor;
 
 @Getter
-@Builder
 public class MultipleRuleNode extends Node {
 
-    private RuleDeclareNode ruleDeclare;
+    private final RuleDeclareNode ruleDeclare;
 
-    private List<RuleGroupNode> ruleGroups;
+    private final List<RuleGroupNode> ruleGroups;
 
-    private AssertionNode assertion;
+    private final AssertionNode assertion;
 
-    public MultipleRuleNode(RuleDeclareNode ruleDeclare,
+    public MultipleRuleNode(NodeLocation location,
+                            RuleDeclareNode ruleDeclare,
                             List<RuleGroupNode> ruleGroups,
                             AssertionNode assertion) {
+        super(location);
         this.ruleDeclare = ruleDeclare;
         this.ruleDeclare.setParent(this);
         this.assertion = assertion;
@@ -30,4 +32,8 @@ public class MultipleRuleNode extends Node {
         this.children.add(assertion);
     }
 
+    @Override
+    public <R, C> R accept(AstVisitor<R, C> visitor, C context) {
+        return visitor.visitMultipleRule(this, context);
+    }
 }

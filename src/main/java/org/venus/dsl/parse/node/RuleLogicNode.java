@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.venus.dsl.parse.node.type.OperationType;
 import org.venus.dsl.parse.node.value.ValueTakeNode;
+import org.venus.dsl.visitor.AstVisitor;
 
 import java.util.List;
 
@@ -21,10 +22,12 @@ public class RuleLogicNode extends Node {
 
     private final List<DictMappingNode> dictMappings;
 
-    public RuleLogicNode(ValueTakeNode lhs,
+    public RuleLogicNode(NodeLocation location,
+                         ValueTakeNode lhs,
+                         ValueTakeNode rhs,
                          List<DictMappingNode> dictMappings,
-                         OperationType operationType,
-                         ValueTakeNode rhs) {
+                         OperationType operationType) {
+        super(location);
         this.lhs = lhs;
         this.rhs = rhs;
         this.lhs.setParent(this);
@@ -33,7 +36,7 @@ public class RuleLogicNode extends Node {
         this.operationType = operationType;
         this.children.add(lhs);
         this.children.add(rhs);
-        if(dictMappings != null) {
+        if (dictMappings != null) {
             for (DictMappingNode dictMappingNode : dictMappings) {
                 dictMappingNode.setParent(this);
                 this.children.add(dictMappingNode);
@@ -41,41 +44,8 @@ public class RuleLogicNode extends Node {
         }
     }
 
-    public static Builder builder() {
-        return new Builder();
+    @Override
+    public <R, C> R accept(AstVisitor<R, C> visitor, C context) {
+        return visitor.visitRuleLogic(this, context);
     }
-
-    public static class Builder {
-
-        private ValueTakeNode lhs;
-        private ValueTakeNode rhs;
-        private OperationType operationType;
-        private List<DictMappingNode> dictMappings;
-
-        public Builder lhs(ValueTakeNode lhs) {
-            this.lhs = lhs;
-            return this;
-        }
-
-        public Builder rhs(ValueTakeNode rhs) {
-            this.rhs = rhs;
-            return this;
-        }
-
-        public Builder operationType(OperationType operationType) {
-            this.operationType = operationType;
-            return this;
-        }
-
-        public Builder dictMappings(List<DictMappingNode> dictMappings) {
-            this.dictMappings = dictMappings;
-            return this;
-        }
-
-        // 构建方法
-        public RuleLogicNode build() {
-            return new RuleLogicNode(lhs, dictMappings, operationType, rhs);
-        }
-    }
-
 }

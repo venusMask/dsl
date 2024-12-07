@@ -1,12 +1,21 @@
 package org.venus.dsl.parse.node;
 
-import lombok.Builder;
 import lombok.Getter;
+import org.venus.dsl.visitor.AstVisitor;
 
 @Getter
-@Builder
 public class DictMappingNode extends Node {
 
-    private String dictName;
+    private final String dictName;
 
+    public DictMappingNode(NodeLocation location,
+                           String dictName) {
+        super(location);
+        this.dictName = dictName;
+    }
+
+    @Override
+    public <R, C> R accept(AstVisitor<R, C> visitor, C context) {
+        return visitor.visitDictMapping(this, context);
+    }
 }

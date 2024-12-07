@@ -1,13 +1,12 @@
 package org.venus.dsl.parse.node;
 
-import lombok.Builder;
 import lombok.Getter;
+import org.venus.dsl.visitor.AstVisitor;
 
 import java.util.HashMap;
 import java.util.List;
 
 @Getter
-@Builder
 public class RuleGroupNode extends Node {
 
     private final RuleDeclareNode ruleDeclare;
@@ -18,9 +17,11 @@ public class RuleGroupNode extends Node {
 
     private final HashMap<String, RuleDefinitionNode> ruleDefinitionMap = new HashMap<>();
 
-    public RuleGroupNode(RuleDeclareNode ruleDeclare,
+    public RuleGroupNode(NodeLocation location,
+                         RuleDeclareNode ruleDeclare,
                          List<RuleDefinitionNode> ruleDefinition,
                          AssertionNode assertion) {
+        super(location);
         this.ruleDeclare = ruleDeclare;
         this.ruleDeclare.setParent(this);
         this.ruleDefinition = ruleDefinition;
@@ -35,4 +36,8 @@ public class RuleGroupNode extends Node {
         });
     }
 
+    @Override
+    public <R, C> R accept(AstVisitor<R, C> visitor, C context) {
+        return visitor.visitRuleGroup(this, context);
+    }
 }

@@ -9,9 +9,6 @@ import org.venus.dsl.ast.DslLexer;
 import org.venus.dsl.ast.DslParser;
 import org.venus.dsl.parse.AstParse;
 import org.venus.dsl.parse.node.*;
-import org.venus.dsl.visitor.BaseVisitor;
-import org.venus.dsl.visitor.MultipleRuleVisitor;
-import org.venus.dsl.visitor.SingleRuleVisitor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,14 +23,16 @@ public class Analyze {
 
     private Boolean isSingleRule;
 
-    public Analyze(SingleRuleNode singleRuleNode) {
+    public Analyze() {}
+
+    public void initSingleRule(SingleRuleNode singleRuleNode) {
         this.isSingleRule = true;
         RuleGroupNode groupNode = singleRuleNode.getRuleGroup();
         String ruleCode = groupNode.getRuleDeclare().getRuleCode();
         ruleGroups.put(ruleCode, groupNode);
     }
 
-    public Analyze(MultipleRuleNode multipleRuleNode) {
+    public void initMultipleRules(MultipleRuleNode multipleRuleNode) {
         this.isSingleRule = false;
         List<RuleGroupNode> groups = multipleRuleNode.getRuleGroups();
         for (RuleGroupNode groupNode : groups) {
@@ -54,23 +53,14 @@ public class Analyze {
         return node;
     }
 
-    public static BaseVisitor parse(String input) {
+    public Node parse(String input) {
         CharStream charStream = CharStreams.fromString(input);
         DslLexer lexer = new DslLexer(charStream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         DslParser parser = new DslParser(tokens);
         ParseTree root = parser.dsl();
         AstParse dslVisitor = new AstParse();
-        Node node = dslVisitor.visit(root);
-        // 单节点
-        if(node instanceof SingleRuleNode) {
-            Analyze analyze = new Analyze((SingleRuleNode) node);
-            return new SingleRuleVisitor((SingleRuleNode) node, analyze);
-        } else if (node instanceof MultipleRuleNode) {
-            Analyze analyze = new Analyze((MultipleRuleNode) node);
-            return new MultipleRuleVisitor((MultipleRuleNode) node, analyze);
-        }
-        throw new RuntimeException("Unreachable");
+        return dslVisitor.visit(root);
     }
 
 }

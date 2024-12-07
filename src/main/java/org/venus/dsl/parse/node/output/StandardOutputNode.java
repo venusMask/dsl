@@ -1,22 +1,24 @@
 package org.venus.dsl.parse.node.output;
 
-import lombok.Builder;
 import lombok.Getter;
 import org.venus.dsl.parse.node.type.OperationType;
+import org.venus.dsl.visitor.AstVisitor;
+import org.venus.dsl.parse.node.NodeLocation;
 
 @Getter
-@Builder
 public class StandardOutputNode extends OutputExprNode {
 
-    private OutputExprNode leftOutputExpr;
+    private final OutputExprNode leftOutputExpr;
 
-    private OperationType operationType;
+    private final OperationType operationType;
 
-    private OutputExprNode rightOutputExpr;
+    private final OutputExprNode rightOutputExpr;
 
-    public StandardOutputNode(OutputExprNode rightOutputExpr,
-                              OperationType operationType,
-                              OutputExprNode leftOutputExpr) {
+    public StandardOutputNode(NodeLocation location,
+                              OutputExprNode leftOutputExpr,
+                              OutputExprNode rightOutputExpr,
+                              OperationType operationType) {
+        super(location);
         this.rightOutputExpr = rightOutputExpr;
         this.rightOutputExpr.setParent(this);
         this.operationType = operationType;
@@ -24,5 +26,10 @@ public class StandardOutputNode extends OutputExprNode {
         this.leftOutputExpr.setParent(this);
         this.children.add(leftOutputExpr);
         this.children.add(rightOutputExpr);
+    }
+
+    @Override
+    public <R, C> R accept(AstVisitor<R, C> visitor, C context) {
+        return visitor.visitStandardOutput(this, context);
     }
 }

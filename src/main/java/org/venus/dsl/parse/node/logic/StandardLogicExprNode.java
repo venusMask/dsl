@@ -1,22 +1,24 @@
 package org.venus.dsl.parse.node.logic;
 
-import lombok.Builder;
 import lombok.Getter;
 import org.venus.dsl.parse.node.type.OperationType;
+import org.venus.dsl.visitor.AstVisitor;
+import org.venus.dsl.parse.node.NodeLocation;
 
 @Getter
-@Builder
 public class StandardLogicExprNode extends LogicExprNode {
 
-    private LogicExprNode leftLogicExpr;
+    private final LogicExprNode leftLogicExpr;
 
-    private OperationType operationType;
+    private final OperationType operationType;
 
-    private LogicExprNode rightLogicExpr;
+    private final LogicExprNode rightLogicExpr;
 
-    public StandardLogicExprNode(LogicExprNode leftLogicExpr,
-                                 OperationType operationType,
-                                 LogicExprNode rightLogicExpr) {
+    public StandardLogicExprNode(NodeLocation location,
+                                 LogicExprNode leftLogicExpr,
+                                 LogicExprNode rightLogicExpr,
+                                 OperationType operationType) {
+        super(location);
         this.leftLogicExpr = leftLogicExpr;
         this.leftLogicExpr.setParent(this);
         this.operationType = operationType;
@@ -24,6 +26,11 @@ public class StandardLogicExprNode extends LogicExprNode {
         this.rightLogicExpr.setParent(this);
         this.children.add(leftLogicExpr);
         this.children.add(rightLogicExpr);
+    }
+
+    @Override
+    public <R, C> R accept(AstVisitor<R, C> visitor, C context) {
+        return visitor.visitStandardLogicExpr(this, context);
     }
 
 }

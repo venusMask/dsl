@@ -1,17 +1,29 @@
 package org.venus.dsl.parse.node.value;
 
-import lombok.Builder;
 import lombok.Getter;
 import org.venus.dsl.parse.node.type.ValueType;
+import org.venus.dsl.visitor.AstVisitor;
+import org.venus.dsl.parse.node.NodeLocation;
 
 import java.util.List;
 
 @Getter
-@Builder
 public class ListTakeNode extends ValueTakeNode {
 
-    private List<String> values;
+    private final List<String> values;
 
-    private ValueType valueType;
+    private final ValueType valueType;
 
+    public ListTakeNode(NodeLocation location,
+                        List<String> values,
+                        ValueType valueType) {
+        super(location);
+        this.values = values;
+        this.valueType = valueType;
+    }
+
+    @Override
+    public <R, C> R accept(AstVisitor<R, C> visitor, C context) {
+        return visitor.visitListTake(this, context);
+    }
 }

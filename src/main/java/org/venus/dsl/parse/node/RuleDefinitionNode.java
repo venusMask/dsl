@@ -1,20 +1,21 @@
 package org.venus.dsl.parse.node;
 
-import lombok.Builder;
 import lombok.Getter;
+import org.venus.dsl.visitor.AstVisitor;
 
 import java.util.List;
 
 @Getter
-@Builder
 public class RuleDefinitionNode extends Node {
 
-    private String ruleCode;
+    private final String ruleCode;
 
-    private List<RuleLogicNode> ruleLogics;
+    private final List<RuleLogicNode> ruleLogics;
 
-    public RuleDefinitionNode(String ruleCode,
+    public RuleDefinitionNode(NodeLocation location,
+                              String ruleCode,
                               List<RuleLogicNode> ruleLogics) {
+        super(location);
         this.ruleCode = ruleCode;
         this.ruleLogics = ruleLogics;
         RuleLogicNode prev = null;
@@ -26,4 +27,8 @@ public class RuleDefinitionNode extends Node {
         }
     }
 
+    @Override
+    public <R, C> R accept(AstVisitor<R, C> visitor, C context) {
+        return visitor.visitRuleDefinition(this, context);
+    }
 }
