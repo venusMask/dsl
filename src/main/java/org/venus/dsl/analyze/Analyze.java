@@ -5,8 +5,10 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.RuleNode;
 import org.venus.dsl.ast.DslLexer;
 import org.venus.dsl.ast.DslParser;
+import org.venus.dsl.data.TreeNode;
 import org.venus.dsl.parse.AstParse;
 import org.venus.dsl.parse.node.*;
 
@@ -23,7 +25,21 @@ public class Analyze {
 
     private Boolean isSingleRule;
 
+    private final HashMap<String, TreeNode> roots = new HashMap<>();
+
     public Analyze() {}
+
+    public TreeNode getRoot(String tableName) {
+        TreeNode root = roots.get(tableName);
+        if (root == null) {
+            throw new NullPointerException("There is no root for table " + tableName);
+        }
+        return root;
+    }
+
+    public void addRoot(String tableName, TreeNode root) {
+        roots.put(tableName, root);
+    }
 
     public void initSingleRule(SingleRuleNode singleRuleNode) {
         this.isSingleRule = true;

@@ -8,6 +8,8 @@ import org.venus.dsl.parse.node.NodeLocation;
 @Getter
 public class FieldTakeNode extends ValueTakeNode {
 
+    private final String tableName;
+
     private final String fieldName;
 
     private final ValueType valueType;
@@ -16,7 +18,12 @@ public class FieldTakeNode extends ValueTakeNode {
                          String fieldName,
                          ValueType valueType) {
         super(location);
-        this.fieldName = fieldName;
+        String[] fields = fieldName.trim().split("\\.");
+        if(fields.length != 2) {
+            throw new IllegalArgumentException("Invalid field name: " + fieldName + ". please specify a table name.");
+        }
+        this.tableName = fields[0];
+        this.fieldName = fields[1];
         this.valueType = valueType;
     }
 

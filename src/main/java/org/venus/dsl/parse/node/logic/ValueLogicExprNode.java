@@ -19,4 +19,11 @@ public class ValueLogicExprNode  extends LogicExprNode {
     public <R, C> R accept(AstVisitor<R, C> visitor, C context) {
         return visitor.visitValueLogicExpr(this, context);
     }
+
+    @Override
+    public String toString() {
+        return "ValueLogicExprNode{" +
+                "ruleCode='" + ruleCode + '\'' +
+                '}';
+    }
 }

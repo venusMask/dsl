@@ -12,6 +12,7 @@ public class BaseTest extends TestCase {
 
     private Object execute(TreeNode context, String rule) {
         Analyze analyze = new Analyze();
+        analyze.addRoot("default", context);
         Node root = analyze.parse(rule);
         ExecutorVisitor executorVisitor = new ExecutorVisitor(analyze);
         return executorVisitor.process(root, context);
@@ -21,7 +22,7 @@ public class BaseTest extends TestCase {
         TreeNode root = TreeNodeTest.buildCTTreeData();
         String simpleRule =
                 "rule_1 \"aa\"\n" +
-                "r1 ${检查项目类型} = \"CT\"\n" +
+                "r1 ${default.检查项目类型} = \"CT\"\n" +
                 "满足 r1 输出 \"匹配\"\n" +
                 "其他输出 \"没有匹配\"";
         Object result = execute(root, simpleRule);
@@ -33,8 +34,8 @@ public class BaseTest extends TestCase {
 
         String nestRule =
                 "rule_1 \"aa\"\n" +
-                "r1 ${检查项目类型} = \"CT\"\n" +
-                "r2 ${病灶描述} = \"结节\"; ${病灶存在状态} = \"确定\"\n" +
+                "r1 ${default.检查项目类型} = \"CT\"\n" +
+                "r2 ${default.病灶描述} = \"结节\"; ${default.病灶存在状态} = \"确定\"\n" +
                 "满足 r1 and r2 输出 \"匹配\"\n" +
                 "其他输出 \"没有匹配\"";
         Object result = execute(root, nestRule);
@@ -42,8 +43,8 @@ public class BaseTest extends TestCase {
 
         String nestRule2 =
                 "rule_1 \"aa\"\n" +
-                "r1 ${检查项目类型} = \"CT\"\n" +
-                "r2 ${病灶描述} = \"结节\"; ${病灶存在状态} = \"疑似\"\n" +
+                "r1 ${default.检查项目类型} = \"CT\"\n" +
+                "r2 ${default.病灶描述} = \"结节\"; ${default.病灶存在状态} = \"疑似\"\n" +
                 "满足 r1 and r2 输出 \"匹配\"\n" +
                 "其他输出 \"没有匹配\"";
         Object result2 = execute(root, nestRule2);
@@ -54,8 +55,8 @@ public class BaseTest extends TestCase {
         TreeNode root = TreeNodeTest.buildCTTreeData();
         String rule =
                 "rule_1 \"aa\"\n" +
-                "r1 ${检查项目类型} contains \"CT\"\n" +
-                "r2 ${病灶描述} contains \"软组织影\"; ${病灶存在状态} = \"疑似\"\n" +
+                "r1 ${default.检查项目类型} contains \"CT\"\n" +
+                "r2 ${default.病灶描述} contains \"软组织影\"; ${default.病灶存在状态} = \"疑似\"\n" +
                 "满足 r1 and r2 输出 \"匹配\"\n" +
                 "其他输出 \"没有匹配\"";
         Object result = execute(root, rule);
@@ -66,8 +67,8 @@ public class BaseTest extends TestCase {
         TreeNode root = TreeNodeTest.buildCTTreeData();
         String rule =
                 "rule_1 \"aa\"\n" +
-                        "r1 ${检查项目类型} contains \"CT\"\n" +
-                        "r2 ${病灶描述} contains \"软组织影\"; ${病灶存在状态} = \"确定\"\n" +
+                        "r1 ${default.检查项目类型} contains \"CT\"\n" +
+                        "r2 ${default.病灶描述} contains \"软组织影\"; ${default.病灶存在状态} = \"确定\"\n" +
                         "满足 r1 and r2 输出 \"匹配\"\n" +
                         "其他输出 \"没有匹配\"";
         Object result = execute(root, rule);
@@ -79,7 +80,7 @@ public class BaseTest extends TestCase {
 
         String rule =
                 "rule_1 \"aa\"\n" +
-                        "r1 ${检查时间} >= ${就诊时间}" +
+                        "r1 ${default.检查时间} >= ${default.就诊时间}" +
                         "满足 r1 输出 \"匹配\"\n" +
                         "其他输出 \"没有匹配\"";
         Object result = execute(root, rule);
@@ -87,7 +88,7 @@ public class BaseTest extends TestCase {
 
         String rule1 =
                 "rule_1 \"aa\"\n" +
-                        "r1 ${检查时间} > ${就诊时间}" +
+                        "r1 ${default.检查时间} > ${default.就诊时间}" +
                         "满足 r1 输出 \"匹配\"\n" +
                         "其他输出 \"没有匹配\"";
         Object result1 = execute(root, rule1);
@@ -95,7 +96,7 @@ public class BaseTest extends TestCase {
 
         String rule2 =
                 "rule_1 \"aa\"\n" +
-                        "r1 ${检查时间} < ${就诊时间}" +
+                        "r1 ${default.检查时间} < ${default.就诊时间}" +
                         "满足 r1 输出 \"匹配\"\n" +
                         "其他输出 \"没有匹配\"";
         Object result2 = execute(root, rule2);

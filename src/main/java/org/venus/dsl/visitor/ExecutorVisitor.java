@@ -9,10 +9,7 @@ import org.venus.dsl.parse.node.output.*;
 import org.venus.dsl.parse.node.type.OperationType;
 import org.venus.dsl.parse.node.value.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 public class ExecutorVisitor
@@ -21,6 +18,8 @@ public class ExecutorVisitor
     private final Analyze analyze;
 
     private String currentRuleGroup;
+
+    private final HashMap<String, List<String>> match = new HashMap<>();
 
     public ExecutorVisitor(Analyze analyze) {
         this.analyze = analyze;
@@ -93,6 +92,19 @@ public class ExecutorVisitor
     }
 
     @Override
+    public Object visitAssertion(AssertionNode node, TreeNode context) {
+        List<MatchNode> matchNodes = node.getMatches();
+        List<OutputExprNode> otherOutput = node.getOtherOutputs();
+        for (MatchNode matchNode : matchNodes) {
+            Object result = process(matchNode, context);
+            if(result != null) {
+                return result;
+            }
+        }
+        return process(otherOutput.get(0), context);
+    }
+
+    @Override
     public Object visitMatch(MatchNode node, TreeNode context) {
         LogicExprNode logicExprNode = node.getLogicExpr();
         Boolean flag = (Boolean) process(logicExprNode, context);
@@ -112,7 +124,15 @@ public class ExecutorVisitor
     @Override
     public Object visitExcludeLogicExpr(ExcludeLogicExprNode node, TreeNode context) {
         Object flag = process(node.getLogicExpr(), context);
-        return !(boolean) flag;
+        if(flag instanceof Boolean) {
+            Boolean f = (Boolean) flag;
+            if(!f) {
+
+                return true;
+            }
+            return false;
+        }
+        throw new RuntimeException("Error return type: {}");
     }
 
     @Override
@@ -137,12 +157,22 @@ public class ExecutorVisitor
      * 此处需要判断当前正在执行的是哪一个ruleGroup
      */
     @Override
-    public Object visitValueLogicExpr(ValueLogicExprNode node, TreeNode context) {
+    public Boolean visitValueLogicExpr(ValueLogicExprNode node, TreeNode context) {
         String ruleCode = node.getRuleCode();
         Boolean isSingleRule = analyze.getIsSingleRule();
         if(isSingleRule) {
             RuleDefinitionNode ruleDefinition = analyze.getRuleDefinitionNode(currentRuleGroup, ruleCode);
-            return process(ruleDefinition, context);
+            Object result = process(ruleDefinition, context);
+            if(result instanceof Boolean) {
+                Boolean f = (Boolean) result;
+                if(f) {
+                    match.computeIfAbsent(currentRuleGroup, k -> new ArrayList<>()).add(ruleCode);
+                    log.info("Match success: group: {}, rule code: {}", currentRuleGroup, ruleCode);
+                    return true;
+                }
+                return false;
+            }
+            throw new RuntimeException("Error return type");
         } else {
             RuleGroupNode ruleGroup = analyze.getRuleGroup(ruleCode);
             analyze.setIsSingleRule(true);
@@ -153,11 +183,6 @@ public class ExecutorVisitor
     }
 
     @Override
-    public Object visitValueTake(ValueTakeNode node, TreeNode context) {
-        return super.visitValueTake(node, context);
-    }
-
-    @Override
     public Object visitDirectTake(DirectTakeNode node, TreeNode context) {
         String directValue = node.getDirectValue();
         return Collections.singletonList(TreeNode.build(directValue, directValue));
@@ -165,8 +190,10 @@ public class ExecutorVisitor
 
     @Override
     public Object visitFieldTake(FieldTakeNode node, TreeNode context) {
+        String tableName = node.getTableName();
         String fieldName = node.getFieldName();
-        return TreeNode.searchValues(context, fieldName);
+        TreeNode root = analyze.getRoot(tableName);
+        return TreeNode.searchValues(root, fieldName);
     }
 
     @Override
@@ -233,21 +260,7 @@ public class ExecutorVisitor
     @Override
     public Object visitRuleGroup(RuleGroupNode node, TreeNode context) {
         currentRuleGroup = node.getRuleDeclare().getRuleCode();
-        log.info("currentRuleGroup: " + currentRuleGroup);
         return process(node.getAssertion(), context);
-    }
-
-    @Override
-    public Object visitAssertion(AssertionNode node, TreeNode context) {
-        List<MatchNode> matchNodes = node.getMatches();
-        List<OutputExprNode> otherOutput = node.getOtherOutputs();
-        for (MatchNode matchNode : matchNodes) {
-            Object result = process(matchNode, context);
-            if(result != null) {
-                return result;
-            }
-        }
-        return process(otherOutput.get(0), context);
     }
 
 }
