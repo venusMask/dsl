@@ -2,6 +2,7 @@ package org.venus.dsl.visitor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.venus.dsl.analyze.Analyze;
+import org.venus.dsl.data.DictHandler;
 import org.venus.dsl.data.TreeNode;
 import org.venus.dsl.parse.node.*;
 import org.venus.dsl.parse.node.logic.*;
@@ -19,10 +20,13 @@ public class ExecutorVisitor
 
     private String currentRuleGroup;
 
+    private DictHandler dictHandler;
+
     private final HashMap<String, List<String>> match = new HashMap<>();
 
-    public ExecutorVisitor(Analyze analyze) {
+    public ExecutorVisitor(Analyze analyze, DictHandler dictHandler) {
         this.analyze = analyze;
+        this.dictHandler = dictHandler;
     }
 
     @Override
@@ -50,11 +54,29 @@ public class ExecutorVisitor
         return false;
     }
 
+    private TreeNode processDictNode(TreeNode lhsObj, List<DictMappingNode> dictMappingNodes) {
+        for (DictMappingNode dictMappingNode : dictMappingNodes) {
+            Object returnValue = process(dictMappingNode, lhsObj);
+            if(returnValue != null) {
+                lhsObj = new TreeNode(null, String.valueOf(returnValue));
+            } else {
+                return new TreeNode("null", "null");
+            }
+        }
+        return lhsObj;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public Object visitRuleLogic(RuleLogicNode node, TreeNode context) {
         OperationType operationType = node.getOperationType();
         List<TreeNode> lhsObj = (List<TreeNode>) process(node.getLhs(), context);
+        List<DictMappingNode> dictMappings = node.getDictMappings();
+        ArrayList<TreeNode> newLhsObj = new ArrayList<>();
+        for (TreeNode treeNode : lhsObj) {
+            newLhsObj.add(processDictNode(treeNode, dictMappings));
+        }
+        lhsObj = newLhsObj;
         List<TreeNode> rhsObj = (List<TreeNode>) process(node.getRhs(), context);
         if (operationType == OperationType.EQUAL) {
             return OperationTypeVisitor.equal(lhsObj, rhsObj);
@@ -115,10 +137,12 @@ public class ExecutorVisitor
         }
     }
 
-    // TODO
     @Override
     public Object visitDictMapping(DictMappingNode node, TreeNode context) {
-        return super.visitDictMapping(node, context);
+        FieldTakeNode field = node.getField();
+        String fieldName = field.getFieldName();
+        String fieldValue = context.getFieldValue();
+        return dictHandler.mapping(node.getDictName(), fieldName, fieldValue);
     }
 
     @Override
@@ -127,12 +151,11 @@ public class ExecutorVisitor
         if(flag instanceof Boolean) {
             Boolean f = (Boolean) flag;
             if(!f) {
-
                 return true;
             }
             return false;
         }
-        throw new RuntimeException("Error return type: {}");
+        throw new RuntimeException("Error return type: " + flag);
     }
 
     @Override

@@ -1,10 +1,15 @@
 package org.venus.dsl.parse.node;
 
 import lombok.Getter;
+import lombok.Setter;
+import org.venus.dsl.parse.node.value.FieldTakeNode;
 import org.venus.dsl.visitor.AstVisitor;
 
 @Getter
 public class DictMappingNode extends Node {
+
+    @Setter
+    private FieldTakeNode field;
 
     private final String dictName;
 

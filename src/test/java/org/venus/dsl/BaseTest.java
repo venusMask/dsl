@@ -12,10 +12,22 @@ public class BaseTest extends TestCase {
 
     private Object execute(TreeNode context, String rule) {
         Analyze analyze = new Analyze();
+        MemoryDictHandler dictHandler = new MemoryDictHandler();
         analyze.addRoot("default", context);
         Node root = analyze.parse(rule);
-        ExecutorVisitor executorVisitor = new ExecutorVisitor(analyze);
+        ExecutorVisitor executorVisitor = new ExecutorVisitor(analyze, dictHandler);
         return executorVisitor.process(root, context);
+    }
+
+    public void testDict() throws Exception {
+        TreeNode root = TreeNodeTest.buildCTTreeData();
+        String simpleRule =
+                "rule_1 \"aa\"\n" +
+                        "r1 ${default.检查项目类型} -> [b] = \"null\"\n" +
+                        "满足 r1 输出 \"匹配\"\n" +
+                        "其他输出 \"没有匹配\"";
+        Object result = execute(root, simpleRule);
+        assertEquals(result, "没有匹配");
     }
 
     public void testSimpleCase() throws Exception {

@@ -100,7 +100,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     private ArrayList<DictMappingNode>
     loadDictNodes(List<DslParser.DictMappingContext> dictContexts) {
         if (dictContexts == null || dictContexts.isEmpty()) {
-            return null;
+            return new ArrayList<>();
         }
         ArrayList<DictMappingNode> dictNodes = new ArrayList<>(dictContexts.size());
         for (DslParser.DictMappingContext dictContext : dictContexts) {
@@ -117,6 +117,17 @@ public class AstParse extends DslBaseVisitor<Node> {
         ValueTakeNode lhsNode = (ValueTakeNode) visit(lhs);
         ValueTakeNode rhsNode = (ValueTakeNode) visit(rhs);
         ArrayList<DictMappingNode> dictNodes = loadDictNodes(context.getRuleContexts(DslParser.DictMappingContext.class));
+        // 带有字典的前面必须是FieldTakeNode, 否则无法确定进行哪个词典映射
+        if(dictNodes != null && !dictNodes.isEmpty()) {
+            if(lhsNode instanceof FieldTakeNode) {
+                FieldTakeNode fieldTakeNode = (FieldTakeNode) lhsNode;
+                for (DictMappingNode dictNode : dictNodes) {
+                    dictNode.setField(fieldTakeNode);
+                }
+            } else {
+                throw new RuntimeException("解析rule_logic失败, 失败位置: " + getLocation(context));
+            }
+        }
         return new RuleLogicNode(
                 getLocation(context),
                 lhsNode,
@@ -129,6 +140,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     @Override
     public DictMappingNode visitDictMapping(DslParser.DictMappingContext ctx) {
         String dictName = ctx.STRING_SQUARE_BRACKETS().getText();
+        dictName = trimString(dictName.strip());
         return new DictMappingNode(getLocation(ctx), dictName);
     }
 
@@ -360,6 +372,7 @@ public class AstParse extends DslBaseVisitor<Node> {
         return new ListTakeNode(getLocation(ctx), list, ValueType.LIST);
     }
 
+    // 去除字符串额外带的双引号
     private String trimString(String str) {
         String trim = str.trim();
         if (trim.isEmpty()) {

@@ -20,4 +20,12 @@ public final class NodeLocation
     {
         return charPositionInLine + 1;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "line=" + line +
+                ", charPositionInLine=" + charPositionInLine +
+                '}';
+    }
 }
