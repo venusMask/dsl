@@ -59,12 +59,12 @@ public class OperationTypeVisitor {
         return res;
     }
 
-    public static boolean notContains(List<TreeNode> lhs, List<TreeNode> rhs) {
+    public static Boolean notContains(List<TreeNode> lhs, List<TreeNode> rhs) {
         List<TreeNode> res = contains(lhs, rhs);
         if(res.isEmpty()) {
-            return true;
+            return Boolean.TRUE;
         } else {
-            return false;
+            return Boolean.FALSE;
         }
     }
 

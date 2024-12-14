@@ -1,9 +1,10 @@
 package org.venus.dsl.parse;
 
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.venus.dsl.ast.DslLexer;
 import org.venus.dsl.parse.node.*;
 import org.venus.dsl.parse.node.logic.*;
 import org.venus.dsl.parse.node.output.*;
@@ -21,6 +22,8 @@ import static java.util.Objects.requireNonNull;
 
 @Slf4j
 public class AstParse extends DslBaseVisitor<Node> {
+
+    private String tableName;
 
     @Override
     public SingleRuleNode visitSingleRule(DslParser.SingleRuleContext ctx) {
@@ -128,6 +131,10 @@ public class AstParse extends DslBaseVisitor<Node> {
                 throw new RuntimeException("解析rule_logic失败, 失败位置: " + getLocation(context));
             }
         }
+        if(lhsNode instanceof FieldTakeNode) {
+            FieldTakeNode fieldTakeNode = (FieldTakeNode) lhsNode;
+            tableName = fieldTakeNode.getTableName();
+        }
         return new RuleLogicNode(
                 getLocation(context),
                 lhsNode,
@@ -140,7 +147,7 @@ public class AstParse extends DslBaseVisitor<Node> {
     @Override
     public DictMappingNode visitDictMapping(DslParser.DictMappingContext ctx) {
         String dictName = ctx.STRING_SQUARE_BRACKETS().getText();
-        dictName = trimString(dictName.strip());
+        dictName = trimString(dictName.trim());
         return new DictMappingNode(getLocation(ctx), dictName);
     }
 
@@ -392,6 +399,17 @@ public class AstParse extends DslBaseVisitor<Node> {
 
     public static NodeLocation getLocation(Token token) {
         return new NodeLocation(token.getLine(), token.getCharPositionInLine());
+    }
+
+    public TableInfo parse(String input) {
+        CharStream charStream = CharStreams.fromString(input);
+        DslLexer lexer = new DslLexer(charStream);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        DslParser parser = new DslParser(tokens);
+        ParseTree root = parser.dsl();
+        AstParse dslVisitor = new AstParse();
+        Node node = dslVisitor.visit(root);
+        return new TableInfo(node, dslVisitor.tableName);
     }
 
 }

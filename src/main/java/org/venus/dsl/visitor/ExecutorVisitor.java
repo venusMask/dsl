@@ -35,23 +35,23 @@ public class ExecutorVisitor
     }
 
     @SuppressWarnings("unchecked")
-    private boolean matchRules(List<RuleLogicNode> ruleLogics,
+    private Boolean matchRules(List<RuleLogicNode> ruleLogics,
                                int index,
                                TreeNode context) {
         if (index >= ruleLogics.size()) {
-            return true;
+            return Boolean.TRUE;
         }
         RuleLogicNode currentRule = ruleLogics.get(index);
         List<TreeNode> matchedNodes = (List<TreeNode>) process(currentRule, context);
         if (matchedNodes == null || matchedNodes.isEmpty()) {
-            return false;
+            return Boolean.FALSE;
         }
         for (TreeNode childNode : matchedNodes) {
             if (matchRules(ruleLogics, index + 1, childNode)) {
-                return true;
+                return Boolean.TRUE;
             }
         }
-        return false;
+        return Boolean.FALSE;
     }
 
     private TreeNode processDictNode(TreeNode lhsObj, List<DictMappingNode> dictMappingNodes) {
@@ -151,9 +151,9 @@ public class ExecutorVisitor
         if(flag instanceof Boolean) {
             Boolean f = (Boolean) flag;
             if(!f) {
-                return true;
+                return Boolean.TRUE;
             }
-            return false;
+            return Boolean.FALSE;
         }
         throw new RuntimeException("Error return type: " + flag);
     }
@@ -169,9 +169,9 @@ public class ExecutorVisitor
         Boolean flag = (Boolean) process(leftLogicExpr, context);
         OperationType operationType = node.getOperationType();
         if (operationType == OperationType.AND) {
-            if (!flag) { return false; }
+            if (!flag) { return Boolean.FALSE; }
         } else if (operationType == OperationType.OR) {
-            if (flag) { return true; }
+            if (flag) { return Boolean.TRUE; }
         }
         return process(node.getRightLogicExpr(), context);
     }
@@ -191,17 +191,17 @@ public class ExecutorVisitor
                 if(f) {
                     match.computeIfAbsent(currentRuleGroup, k -> new ArrayList<>()).add(ruleCode);
                     log.info("Match success: group: {}, rule code: {}", currentRuleGroup, ruleCode);
-                    return true;
+                    return Boolean.TRUE;
                 }
-                return false;
+                return Boolean.FALSE;
             }
             throw new RuntimeException("Error return type");
         } else {
             RuleGroupNode ruleGroup = analyze.getRuleGroup(ruleCode);
-            analyze.setIsSingleRule(true);
+            analyze.setIsSingleRule(Boolean.TRUE);
             Object ruleGroupValue = process(ruleGroup, context);
-            analyze.setIsSingleRule(false);
-            return Objects.equals(ruleGroupValue, "是");
+            analyze.setIsSingleRule(Boolean.FALSE);
+            return (Boolean) Objects.equals(ruleGroupValue, "是");
         }
     }
 
@@ -238,13 +238,13 @@ public class ExecutorVisitor
         Object rightValue = process(node.getRightOutputExpr(), context);
         OperationType operationType = node.getOperationType();
         if (operationType == OperationType.ADD) {
-            return (Long) leftValue + (Long) rightValue;
+            return (Object) ((Long) leftValue + (Long) rightValue);
         } else if (operationType == OperationType.SUBTRACT) {
-            return (Long) leftValue - (Long) rightValue;
+            return (Object) ((Long) leftValue - (Long) rightValue);
         } else if (operationType == OperationType.MULTIPLY) {
-            return (Long) leftValue * (Long) rightValue;
+            return (Object) ((Long) leftValue * (Long) rightValue);
         } else if (operationType == OperationType.DIVIDE) {
-            return (Long) leftValue / (Long) rightValue;
+            return (Object) ((Long) leftValue / (Long) rightValue);
         }
         throw new IllegalStateException("Unsupported operation type: " + operationType);
     }
